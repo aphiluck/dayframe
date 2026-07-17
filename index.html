@@ -813,6 +813,16 @@ function setAuthTab(tab) {
   document.getElementById('tab-signup').className = 'flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ' + (tab === 'signup' ? 'bg-brass text-bg' : 'text-inkdim');
 }
 
+// Races a promise against a timeout so a stalled network call (common on
+// weak mobile connections) can never hang the UI silently forever — it will
+// always resolve to either a real result or a clear, visible error.
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT:' + label)), ms)),
+  ]);
+}
+
 async function doLogin(email, password, silent) {
   const err = document.getElementById('login-error');
   const btn = document.getElementById('login-submit-btn');
@@ -824,46 +834,54 @@ async function doLogin(email, password, silent) {
   // Show loading state
   if (btn) { btn.disabled = true; btn.innerHTML = '<svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg> ກຳລັງເຂົ້າສູ່ລະບົບ...'; }
   err.classList.add('hidden');
-  const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-  if (btn) { btn.disabled = false; btn.innerHTML = 'Enter app'; }
-  if (error) {
-    const msg = error.message || '';
-    if (msg.includes('Invalid login') || msg.includes('invalid') || msg.includes('credentials')) {
-      err.textContent = '❌ ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
-    } else if (msg.includes('Email not confirmed')) {
-      err.textContent = '📧 ກະລຸນາຢືນຢັນອີເມວ — ກວດເບິ່ງ Gmail ຂອງທ່ານ';
-    } else if (msg.includes('network') || msg.includes('fetch')) {
-      err.textContent = '🌐 ບໍ່ມີອິນເຕີເນັດ ກະລຸນາລອງໃໝ່';
-    } else {
-      err.textContent = '⚠️ ' + (msg || 'ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່');
-    }
-    err.classList.remove('hidden');
-    return false;
-  }
-  // Guard: Supabase may return {user: null, session: null} when email is unconfirmed
-  if (!data || !data.user || !data.session) {
-    err.textContent = '📧 ອີເມວຍັງບໍ່ໄດ້ຢືນຢັນ — ກວດເບິ່ງ Gmail ແລ້ວຢືນຢັນກ່ອນ';
-    err.classList.remove('hidden');
-    return false;
-  }
-  err.classList.add('hidden');
+
+  // Everything from here on is wrapped in try/catch/finally so that no
+  // matter what fails (a stalled network call, an unexpected error from
+  // Supabase, or a bug later in the flow), the user ALWAYS sees a message
+  // and the button ALWAYS returns to a usable state — instead of the app
+  // silently freezing on the login screen with no feedback at all.
   try {
+    const { data, error } = await withTimeout(
+      sbClient.auth.signInWithPassword({ email, password }),
+      15000,
+      'signin'
+    );
+    if (error) {
+      const msg = error.message || '';
+      if (msg.includes('Invalid login') || msg.includes('invalid') || msg.includes('credentials')) {
+        err.textContent = '❌ ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
+      } else if (msg.includes('Email not confirmed')) {
+        err.textContent = '📧 ກະລຸນາຢືນຢັນອີເມວກ່ອນ';
+      } else if (msg.includes('network') || msg.includes('fetch')) {
+        err.textContent = '🌐 ບໍ່ມີອິນເຕີເນັດ ກະລຸນາລອງໃໝ່';
+      } else {
+        err.textContent = '⚠️ ' + (msg || 'ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່');
+      }
+      err.classList.remove('hidden');
+      return false;
+    }
+    err.classList.add('hidden');
     const meta = data.user.user_metadata || {};
     state.user = { id: data.user.id, email: data.user.email, name: meta.name || data.user.email, avatar: meta.avatar || null };
-    await loadUserData(state.user.id);
+    try {
+      await withTimeout(loadUserData(state.user.id), 15000, 'loaddata');
+    } catch (loadErr) {
+      // Don't let a stalled/failed cloud-data fetch block entering the app —
+      // fall back to empty local state and let the user in anyway.
+      toast('ໂຫລດຂໍ້ມູນຈາກ cloud ຊ້າ/ບໍ່ສຳເລັດ — ເຂົ້າແອັບດ້ວຍຂໍ້ມູນຫວ່າງໄປກ່ອນ', 5000);
+    }
     enterApp();
+    return true;
   } catch (e) {
-    // enterApp may hide auth-screen before crashing, so use toast instead
-    toast('⚠️ ໂຫລດແອັບຜິດພາດ: ' + (e.message || String(e)), 8000);
-    // Restore auth screen in case enterApp already hid it
-    const authEl = document.getElementById('auth-screen');
-    const appEl = document.getElementById('app-shell');
-    if (authEl) authEl.classList.remove('hidden');
-    if (appEl) appEl.classList.add('hidden');
-    err.textContent = '⚠️ ໂຫລດແອັບຜິດພາດ: ' + (e.message || String(e));
+    const isTimeout = e && String(e.message || '').startsWith('TIMEOUT:');
+    err.textContent = isTimeout
+      ? '🌐 ການເຊື່ອມຕໍ່ຊ້າເກີນໄປ ກະລຸນາລອງໃໝ່ (ເຊັກສັນຍານ WiFi/LTE)'
+      : '⚠️ ເກີດຂໍ້ຜິດພາດທີ່ບໍ່ຄາດຄິດ: ' + (e && e.message ? e.message : String(e));
     err.classList.remove('hidden');
+    return false;
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Enter app'; }
   }
-  return true;
 }
 
 /* ---------------- SIGNUP: EMAIL OTP VERIFICATION ----------------
@@ -1112,27 +1130,13 @@ async function logout() {
 }
 
 function enterApp() {
-  const authEl = document.getElementById('auth-screen');
-  const appEl = document.getElementById('app-shell');
-  try {
-    authEl.classList.add('hidden');
-    appEl.classList.remove('hidden');
-    state.view = 'dashboard';
-    buildNav();
-    render();
-    loadWeather();
-    startNotifScheduler();
-  } catch (e) {
-    // Restore login screen and show error if app shell fails to render
-    console.error('enterApp crash:', e);
-    authEl.classList.remove('hidden');
-    appEl.classList.add('hidden');
-    const err = document.getElementById('login-error');
-    if (err) {
-      err.textContent = '⚠️ ໂຫລດແອັບຜິດພາດ — ' + (e.message || String(e));
-      err.classList.remove('hidden');
-    }
-  }
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  state.view = 'dashboard';
+  buildNav();
+  render();
+  loadWeather();
+  startNotifScheduler();
 }
 
 /* ---------------- NAV ---------------- */
@@ -2713,13 +2717,25 @@ async function init() {
   sbClient.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_OUT' && state.user) logout();
   });
-  const { data: { session } } = await sbClient.auth.getSession();
-  if (session) {
-    const meta = session.user.user_metadata || {};
-    state.user = { id: session.user.id, email: session.user.email, name: meta.name || session.user.email, avatar: meta.avatar || null };
-    await loadUserData(state.user.id);
-    enterApp();
-    return;
+  // Wrapped with a timeout + try/catch: on a stalled/flaky connection this
+  // call must never hang the boot sequence forever with the app stuck on a
+  // blank screen — fall back to the login screen and let the user retry.
+  try {
+    const { data: { session } } = await withTimeout(sbClient.auth.getSession(), 15000, 'getsession');
+    if (session) {
+      const meta = session.user.user_metadata || {};
+      state.user = { id: session.user.id, email: session.user.email, name: meta.name || session.user.email, avatar: meta.avatar || null };
+      try {
+        await withTimeout(loadUserData(state.user.id), 15000, 'loaddata-init');
+      } catch (loadErr) {
+        toast('ໂຫລດຂໍ້ມູນຈາກ cloud ຊ້າ/ບໍ່ສຳເລັດ — ເຂົ້າແອັບດ້ວຍຂໍ້ມູນຫວ່າງໄປກ່ອນ', 5000);
+      }
+      enterApp();
+      return;
+    }
+  } catch (e) {
+    const isTimeout = e && String(e.message || '').startsWith('TIMEOUT:');
+    toast(isTimeout ? '🌐 ການເຊື່ອມຕໍ່ຊ້າເກີນໄປຕອນເປີດແອັບ, ກະລຸນາລອງໃໝ່' : '⚠️ ' + (e && e.message ? e.message : String(e)), 6000);
   }
   setAuthTab('login');
 }
