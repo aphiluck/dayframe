@@ -853,7 +853,14 @@ async function doLogin(email, password, silent) {
     await loadUserData(state.user.id);
     enterApp();
   } catch (e) {
-    err.textContent = '⚠️ ເຂົ້າສູ່ລະບົບສຳເລັດ ແຕ່ໂຫລດຂໍ້ມູນຜິດພາດ: ' + (e.message || e);
+    // enterApp may hide auth-screen before crashing, so use toast instead
+    toast('⚠️ ໂຫລດແອັບຜິດພາດ: ' + (e.message || String(e)), 8000);
+    // Restore auth screen in case enterApp already hid it
+    const authEl = document.getElementById('auth-screen');
+    const appEl = document.getElementById('app-shell');
+    if (authEl) authEl.classList.remove('hidden');
+    if (appEl) appEl.classList.add('hidden');
+    err.textContent = '⚠️ ໂຫລດແອັບຜິດພາດ: ' + (e.message || String(e));
     err.classList.remove('hidden');
   }
   return true;
@@ -1105,13 +1112,27 @@ async function logout() {
 }
 
 function enterApp() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('app-shell').classList.remove('hidden');
-  state.view = 'dashboard';
-  buildNav();
-  render();
-  loadWeather();
-  startNotifScheduler();
+  const authEl = document.getElementById('auth-screen');
+  const appEl = document.getElementById('app-shell');
+  try {
+    authEl.classList.add('hidden');
+    appEl.classList.remove('hidden');
+    state.view = 'dashboard';
+    buildNav();
+    render();
+    loadWeather();
+    startNotifScheduler();
+  } catch (e) {
+    // Restore login screen and show error if app shell fails to render
+    console.error('enterApp crash:', e);
+    authEl.classList.remove('hidden');
+    appEl.classList.add('hidden');
+    const err = document.getElementById('login-error');
+    if (err) {
+      err.textContent = '⚠️ ໂຫລດແອັບຜິດພາດ — ' + (e.message || String(e));
+      err.classList.remove('hidden');
+    }
+  }
 }
 
 /* ---------------- NAV ---------------- */
