@@ -1,6 +1,6 @@
 /* Dayframe Service Worker — offline-first app shell caching */
 
-const CACHE_VERSION = 'dayframe-v4';
+const CACHE_VERSION = 'dayframe-v5';
 const APP_SHELL = [
   './index.html',
   './manifest.json',
