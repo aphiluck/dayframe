@@ -831,7 +831,7 @@ async function doLogin(email, password, silent) {
     if (msg.includes('Invalid login') || msg.includes('invalid') || msg.includes('credentials')) {
       err.textContent = '❌ ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
     } else if (msg.includes('Email not confirmed')) {
-      err.textContent = '📧 ກະລຸນາຢືນຢັນອີເມວກ່ອນ';
+      err.textContent = '📧 ກະລຸນາຢືນຢັນອີເມວ — ກວດເບິ່ງ Gmail ຂອງທ່ານ';
     } else if (msg.includes('network') || msg.includes('fetch')) {
       err.textContent = '🌐 ບໍ່ມີອິນເຕີເນັດ ກະລຸນາລອງໃໝ່';
     } else {
@@ -840,11 +840,22 @@ async function doLogin(email, password, silent) {
     err.classList.remove('hidden');
     return false;
   }
+  // Guard: Supabase may return {user: null, session: null} when email is unconfirmed
+  if (!data || !data.user || !data.session) {
+    err.textContent = '📧 ອີເມວຍັງບໍ່ໄດ້ຢືນຢັນ — ກວດເບິ່ງ Gmail ແລ້ວຢືນຢັນກ່ອນ';
+    err.classList.remove('hidden');
+    return false;
+  }
   err.classList.add('hidden');
-  const meta = data.user.user_metadata || {};
-  state.user = { id: data.user.id, email: data.user.email, name: meta.name || data.user.email, avatar: meta.avatar || null };
-  await loadUserData(state.user.id);
-  enterApp();
+  try {
+    const meta = data.user.user_metadata || {};
+    state.user = { id: data.user.id, email: data.user.email, name: meta.name || data.user.email, avatar: meta.avatar || null };
+    await loadUserData(state.user.id);
+    enterApp();
+  } catch (e) {
+    err.textContent = '⚠️ ເຂົ້າສູ່ລະບົບສຳເລັດ ແຕ່ໂຫລດຂໍ້ມູນຜິດພາດ: ' + (e.message || e);
+    err.classList.remove('hidden');
+  }
   return true;
 }
 
