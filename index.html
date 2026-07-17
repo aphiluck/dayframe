@@ -143,8 +143,8 @@
           <button type="button" data-action="open-forgot-password" class="text-xs text-brass hover:underline">ລືມລະຫັດຜ່ານ?</button>
         </div>
       </div>
-      <p id="login-error" class="text-coral text-xs hidden"></p>
-      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">Enter app</button>
+      <div id="login-error" class="hidden rounded-xl px-4 py-3 text-sm font-medium text-center" style="background:#3B1111;color:#FF7B7B;border:1px solid #7B2020"></div>
+      <button type="submit" id="login-submit-btn" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">Enter app</button>
       <button type="button" data-action="demo-login" class="w-full border border-line text-inkdim hover:text-ink rounded-xl py-3 text-sm transition-colors">ທົດລອງໃຊ້ບັນຊີສາທິດ</button>
     </form>
 
@@ -815,14 +815,28 @@ function setAuthTab(tab) {
 
 async function doLogin(email, password, silent) {
   const err = document.getElementById('login-error');
+  const btn = document.getElementById('login-submit-btn');
   if (!sbClient) {
-    err.textContent = supaErrorMessage(null);
+    err.textContent = '⚠️ ເຊື່ອມຕໍ່ລະບົບບໍ່ໄດ້ — ກະລຸນາລອງ Refresh';
     err.classList.remove('hidden');
     return false;
   }
+  // Show loading state
+  if (btn) { btn.disabled = true; btn.innerHTML = '<svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg> ກຳລັງເຂົ້າສູ່ລະບົບ...'; }
+  err.classList.add('hidden');
   const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+  if (btn) { btn.disabled = false; btn.innerHTML = 'Enter app'; }
   if (error) {
-    err.textContent = 'ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
+    const msg = error.message || '';
+    if (msg.includes('Invalid login') || msg.includes('invalid') || msg.includes('credentials')) {
+      err.textContent = '❌ ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
+    } else if (msg.includes('Email not confirmed')) {
+      err.textContent = '📧 ກະລຸນາຢືນຢັນອີເມວກ່ອນ';
+    } else if (msg.includes('network') || msg.includes('fetch')) {
+      err.textContent = '🌐 ບໍ່ມີອິນເຕີເນັດ ກະລຸນາລອງໃໝ່';
+    } else {
+      err.textContent = '⚠️ ' + (msg || 'ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່');
+    }
     err.classList.remove('hidden');
     return false;
   }
