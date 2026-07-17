@@ -1,0 +1,41 @@
+{
+  "id": "./index.html",
+  "name": "Dayframe — ລະບົບຊີວິດປະຈຳວັນ",
+  "short_name": "Dayframe",
+  "description": "ແດ໊ສບອດສ່ວນຕົວສຳລັບວຽກ, ການເງິນ, ບັນທຶກ ແລະ ນິໄສ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14161C",
+  "theme_color": "#14161C",
+  "orientation": "portrait-primary",
+  "lang": "lo",
+  "dir": "ltr",
+  "categories": ["productivity", "lifestyle", "finance"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2314161C'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23E8A33D' stroke-width='7'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23E8A33D'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

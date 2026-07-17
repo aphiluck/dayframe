@@ -1,0 +1,2693 @@
+<!DOCTYPE html>
+<html lang="lo" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Dayframe — ລະບົບຊີວິດປະຈຳວັນ</title>
+<meta name="description" content="ແດ໊ສບອດສ່ວນຕົວສຳລັບວຽກ, ການເງິນ, ບັນທຶກ ແລະ ນິໄສ" />
+<meta name="theme-color" content="#14161C" />
+<meta name="robots" content="noindex, nofollow" />
+
+<!-- Social share preview (Facebook/LINE/Telegram/Twitter). Replace the image
+     path with an absolute URL (https://yourdomain.com/icons/icon-512.png)
+     once the real hosting domain is known — some platforms won't resolve
+     relative paths correctly. -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Dayframe — ລະບົບຊີວິດປະຈຳວັນ" />
+<meta property="og:description" content="ແດ໊ສບອດສ່ວນຕົວສຳລັບວຽກ, ການເງິນ, ບັນທຶກ ແລະ ນິໄສ" />
+<meta property="og:image" content="./icons/icon-512.png" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Dayframe — ລະບົບຊີວິດປະຈຳວັນ" />
+<meta name="twitter:description" content="ແດ໊ສບອດສ່ວນຕົວສຳລັບວຽກ, ການເງິນ, ບັນທຶກ ແລະ ນິໄສ" />
+<meta name="twitter:image" content="./icons/icon-512.png" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Dayframe" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="./icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2314161C'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23E8A33D' stroke-width='7'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23E8A33D'/%3E%3C/svg%3E" />
+
+<!-- Google Fonts: ดึงฟอนต์ Phetsarath สำหรับภาษาลาว และ Outfit สำหรับภาษาอังกฤษและตัวเลขเชิงโมเดิร์น -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Phetsarath+OT&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" defer></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          bg: '#14161C',
+          surface: '#1A1D25',
+          surface2: '#232733',
+          line: '#2B2F3B',
+          ink: '#EDEEF2',
+          inkdim: '#9398A8',
+          inkfaint: '#5D6274',
+          brass: '#E8A33D',
+          brassdim: '#8A6A34',
+          teal: '#4FBF9F',
+          coral: '#E8615F',
+          violet: '#9086E8',
+        },
+        fontFamily: {
+          display: ['"Outfit"', '"Phetsarath OT"', 'sans-serif'],
+          sans: ['"Phetsarath OT"', '"Outfit"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        boxShadow: {
+          soft: '0 8px 30px -12px rgba(0,0,0,0.5)',
+          fab: '0 10px 25px -6px rgba(232,163,61,0.45)',
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  html, body { background:#14161C; overscroll-behavior-y: none; }
+  body { font-family: 'Phetsarath OT', 'Outfit', sans-serif; line-height: 1.6; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #2B2F3B; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  :focus-visible { outline: 2px solid #E8A33D; outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  .fade-in { animation: fadeIn .25s ease both; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform:translateY(0);} }
+
+  .sheet-in { animation: sheetIn .28s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes sheetIn { from { opacity:0; transform: translateY(24px);} to { opacity:1; transform:translateY(0);} }
+
+  .pop-in { animation: popIn .22s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes popIn { from { opacity:0; transform: scale(.94);} to { opacity:1; transform:scale(1);} }
+
+  .ring-track { transition: background 0.6s ease; }
+
+  .fab-menu-item { animation: fabItem .22s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes fabItem { from { opacity:0; transform: translateY(10px) scale(.9);} to { opacity:1; transform:translateY(0) scale(1);} }
+
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+  input, select, textarea { color-scheme: dark; font-family: 'Phetsarath OT', 'Outfit', sans-serif; }
+
+  .streak-dot { transition: background .2s ease, transform .15s ease; }
+  .streak-dot:active { transform: scale(0.85); }
+
+  .nested-scroll { -webkit-overflow-scrolling: touch; }
+
+  .toast-in { animation: toastIn .25s ease both; }
+  @keyframes toastIn { from { opacity:0; transform: translateY(-10px);} to { opacity:1; transform:translateY(0);} }
+</style>
+</head>
+<body class="bg-bg text-ink antialiased min-h-screen">
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth-screen" class="min-h-screen w-full flex items-center justify-center px-5 py-10">
+  <div class="w-full max-w-sm">
+    <div class="flex flex-col items-center mb-8 fade-in">
+      <div class="relative w-16 h-16 rounded-2xl grid place-items-center mb-4" style="background: conic-gradient(#E8A33D 0deg, #E8A33D 270deg, #2B2F3B 270deg)">
+        <div class="absolute inset-[3px] rounded-[13px] bg-bg grid place-items-center">
+          <i data-lucide="sunrise" class="w-7 h-7 text-brass"></i>
+        </div>
+      </div>
+      <h1 class="font-display text-2xl text-ink tracking-tight">Dayframe</h1>
+      <p class="text-inkdim text-sm mt-1">ລວມທຸກຢ່າງໃນວັນຂອງທ່ານໄວ້ທີ່ດຽວ</p>
+    </div>
+
+    <div class="bg-surface border border-line rounded-2xl p-1.5 flex mb-6 fade-in">
+      <button data-action="auth-tab" data-tab="login" id="tab-login" class="flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors">ເຂົ້າສູ່ລະບົບ</button>
+      <button data-action="auth-tab" data-tab="signup" id="tab-signup" class="flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors">ສະໝັກສະມາຊິກ</button>
+    </div>
+
+    <form id="login-form" class="space-y-3 fade-in">
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ອີເມວ</label>
+        <input required type="email" id="login-email" placeholder="you@example.com" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass transition-colors" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດຜ່ານ</label>
+        <input required type="password" id="login-password" placeholder="••••••••" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass transition-colors" />
+        <div class="flex justify-end mt-1.5">
+          <button type="button" data-action="open-forgot-password" class="text-xs text-brass hover:underline">ລືມລະຫັດຜ່ານ?</button>
+        </div>
+      </div>
+      <p id="login-error" class="text-coral text-xs hidden"></p>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">Enter app</button>
+      <button type="button" data-action="demo-login" class="w-full border border-line text-inkdim hover:text-ink rounded-xl py-3 text-sm transition-colors">ທົດລອງໃຊ້ບັນຊີສາທິດ</button>
+    </form>
+
+    <form id="signup-form" class="space-y-3 fade-in hidden">
+      <div id="signup-fields" class="space-y-3">
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ຊື່</label>
+          <input required type="text" id="signup-name" placeholder="ສົມຊາຍ ໃຈດີ" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass transition-colors" />
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ອີເມວ</label>
+          <input required type="email" id="signup-email" placeholder="you@example.com" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass transition-colors" />
+          <p class="text-inkfaint text-[11px] mt-1">ຕ້ອງເປັນອີເມວທີ່ໃຊ້ງານໄດ້ຈິງ — ພວກເຮົາຈະສົ່ງລະຫັດ OTP ໄປຢືນຢັນ</p>
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດຜ່ານ</label>
+          <input required minlength="4" type="password" id="signup-password" placeholder="ຢ່າງໜ້ອຍ 4 ຕົວອັກສອນ" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass transition-colors" />
+        </div>
+      </div>
+      <div id="signup-otp-fields" class="space-y-3 hidden">
+        <p class="text-inkdim text-xs">ພວກເຮົາໄດ້ສົ່ງລະຫັດ 6 ຕົວໄປທີ່ <span id="signup-otp-email-label" class="text-ink"></span></p>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດ OTP</label>
+          <input maxlength="8" pattern="[0-9]{6,8}" inputmode="numeric" autocomplete="one-time-code" id="signup-otp" placeholder="12345678" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm tracking-[0.3em] text-center placeholder:text-inkfaint focus:border-brass transition-colors" />
+        </div>
+        <div class="flex justify-between text-xs">
+          <button type="button" data-action="signup-back" class="text-inkdim hover:text-ink">‹ ແກ້ໄຂຂໍ້ມູນ</button>
+          <button type="button" data-action="signup-resend-otp" id="signup-resend-btn" class="text-brass hover:underline">ສົ່ງລະຫັດອີກຄັ້ງ</button>
+        </div>
+      </div>
+      <p id="signup-error" class="text-coral text-xs hidden"></p>
+      <button type="submit" id="signup-submit-btn" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">ສ້າງບັນຊີ</button>
+    </form>
+
+    <p class="text-center text-inkfaint text-xs mt-8 fade-in">ຂໍ້ມູນຖືກເກັບໄວ້ໃນອຸປະກອນນີ້ເທົ່ານັ້ນ</p>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell" class="hidden min-h-screen w-full">
+  <div class="lg:flex lg:max-w-6xl lg:mx-auto">
+
+    <!-- Desktop sidebar -->
+    <aside class="hidden lg:flex flex-col w-60 shrink-0 h-screen sticky top-0 border-r border-line px-5 py-6">
+      <div class="flex items-center gap-2.5 mb-8 px-1">
+        <div class="relative w-9 h-9 rounded-xl grid place-items-center" style="background: conic-gradient(#E8A33D 0deg, #E8A33D 270deg, #2B2F3B 270deg)">
+          <div class="absolute inset-[2px] rounded-[9px] bg-bg grid place-items-center">
+            <i data-lucide="sunrise" class="w-4 h-4 text-brass"></i>
+          </div>
+        </div>
+        <span class="font-display text-lg font-semibold tracking-tight">Dayframe</span>
+      </div>
+      <nav class="flex flex-col gap-1" id="sidebar-nav"></nav>
+      <button data-action="open-search" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 mt-3 rounded-xl text-sm text-inkfaint border border-line hover:text-ink hover:bg-surface transition-colors">
+        <span class="flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i> ຄົ້ນຫາ</span>
+        <span class="text-[10px] font-mono border border-line rounded px-1.5 py-0.5">⌘K</span>
+      </button>
+      <div class="mt-auto pt-4 border-t border-line">
+        <button data-action="set-view" data-view="settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-inkdim hover:text-ink hover:bg-surface transition-colors">
+          <i data-lucide="settings" class="w-4 h-4"></i> ຕັ້ງຄ່າ
+        </button>
+        <button data-action="logout" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-inkdim hover:text-coral hover:bg-surface transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i> ອອກຈາກລະບົບ
+        </button>
+      </div>
+    </aside>
+
+    <div class="flex-1 min-w-0">
+      <!-- Mobile top bar -->
+      <header class="lg:hidden sticky top-0 z-30 bg-bg/90 backdrop-blur border-b border-line px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="relative w-8 h-8 rounded-lg grid place-items-center" style="background: conic-gradient(#E8A33D 0deg, #E8A33D 270deg, #2B2F3B 270deg)">
+            <div class="absolute inset-[2px] rounded-[7px] bg-bg grid place-items-center">
+              <i data-lucide="sunrise" class="w-3.5 h-3.5 text-brass"></i>
+            </div>
+          </div>
+          <span class="font-display text-base font-semibold">Dayframe</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button data-action="open-search" class="w-9 h-9 rounded-full bg-surface border border-line grid place-items-center active:scale-90 transition-transform">
+            <i data-lucide="search" class="w-4 h-4 text-inkdim"></i>
+          </button>
+          <button data-action="set-view" data-view="settings" class="w-9 h-9 rounded-full bg-surface border border-line grid place-items-center active:scale-90 transition-transform">
+            <i data-lucide="settings" class="w-4 h-4 text-inkdim"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- View root -->
+      <main id="view-root" class="px-5 lg:px-8 pt-5 pb-28 lg:pb-16 max-w-3xl lg:max-w-none"></main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <nav id="bottom-nav" class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface/95 backdrop-blur border-t border-line px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] flex items-stretch justify-between"></nav>
+
+  <!-- FAB -->
+  <button id="fab-btn" data-action="toggle-fab" class="fixed z-40 bottom-24 right-5 lg:bottom-8 lg:right-8 w-14 h-14 rounded-full bg-brass text-bg shadow-fab grid place-items-center active:scale-90 transition-transform">
+    <i data-lucide="plus" class="w-6 h-6" id="fab-icon"></i>
+  </button>
+
+  <!-- FAB overlay -->
+  <div id="fab-overlay" class="hidden fixed inset-0 z-40">
+    <div class="absolute inset-0 bg-black/60" data-action="toggle-fab"></div>
+    <div class="absolute bottom-40 right-5 lg:bottom-24 lg:right-8 flex flex-col items-end gap-3">
+      <div class="fab-menu-item flex items-center gap-3" style="animation-delay:.06s">
+        <span class="bg-surface2 border border-line text-sm px-3 py-1.5 rounded-lg shadow-soft">ເພີ່ມລາຍຈ່າຍ</span>
+        <button data-action="quick-add" data-type="finance" class="w-12 h-12 rounded-full bg-surface2 border border-line grid place-items-center active:scale-90 transition-transform">
+          <i data-lucide="wallet" class="w-5 h-5 text-teal"></i>
+        </button>
+      </div>
+      <div class="fab-menu-item flex items-center gap-3" style="animation-delay:.03s">
+        <span class="bg-surface2 border border-line text-sm px-3 py-1.5 rounded-lg shadow-soft">ເພີ່ມບັນທຶກ</span>
+        <button data-action="quick-add" data-type="note" class="w-12 h-12 rounded-full bg-surface2 border border-line grid place-items-center active:scale-90 transition-transform">
+          <i data-lucide="notebook-pen" class="w-5 h-5 text-violet"></i>
+        </button>
+      </div>
+      <div class="fab-menu-item flex items-center gap-3">
+        <span class="bg-surface2 border border-line text-sm px-3 py-1.5 rounded-lg shadow-soft">ເພີ່ມວຽກ</span>
+        <button data-action="quick-add" data-type="task" class="w-12 h-12 rounded-full bg-surface2 border border-line grid place-items-center active:scale-90 transition-transform">
+          <i data-lucide="list-todo" class="w-5 h-5 text-brass"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search overlay -->
+<div id="search-root"></div>
+
+<!-- Modal root -->
+<div id="modal-root"></div>
+
+<!-- Toast root -->
+<div id="toast-root" class="fixed top-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 w-full px-5 pointer-events-none"></div>
+
+<script>
+/* =========================================================
+   DAYFRAME — LIFE OS
+   Single-file SPA. Vanilla JS + Tailwind CDN + localStorage.
+   ========================================================= */
+
+/* ---------------- SUPABASE (AUTH + CLOUD DATA SYNC) ----------------
+   1. Create a free project at https://supabase.com
+   2. Project Settings > API — copy "Project URL" and "anon public" key
+      into the two constants below.
+   3. Run the SQL in supabase-schema.sql (provided alongside this file)
+      in the Supabase SQL Editor once, to create the user_data table
+      and its Row Level Security policies.
+   4. Authentication > Email Templates — edit the "Confirm signup" and
+      "Reset password" templates so the body includes {{ .Token }}
+      (a 6-digit code) instead of the default {{ .ConfirmationURL }}
+      link, so it matches this app's OTP-code UI. Example body:
+      "Your Dayframe verification code is {{ .Token }}. It expires in
+      an hour."
+   5. Authentication > Providers > Email — keep "Confirm email" ON so
+      new signups must verify via the OTP code before they can log in.
+   Until SUPABASE_URL/SUPABASE_ANON_KEY are filled in, auth and data
+   sync calls will fail and the UI will show a connection error. */
+const SUPABASE_URL = 'https://efafplnmsmbswuwhzejc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_3r33n0WZfbJhw5xCeD0SMw_nH13-a9P';
+
+function isSupabaseConfigured() {
+  return !SUPABASE_URL.startsWith('YOUR_') && !SUPABASE_ANON_KEY.startsWith('YOUR_');
+}
+
+// NOTE: the Supabase JS library loads via a `defer` <script> tag, which only
+// finishes executing right before DOMContentLoaded — same reason lucide.js
+// is handled this way elsewhere in this file. So this client is created
+// lazily inside init() (see bottom of file) rather than at parse time here,
+// otherwise window.supabase wouldn't exist yet and this would crash.
+let sbClient = null;
+function initSupabaseClient() {
+  if (sbClient || !isSupabaseConfigured() || !window.supabase) return;
+  sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+function supaErrorMessage(e, fallback) {
+  if (!isSupabaseConfigured()) return 'ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ Supabase — ກະລຸນາຕິດຕໍ່ຜູ້ພັດທະນາ';
+  return (e && e.message) || fallback || 'ເກີດຂໍ້ຜິດພາດ, ກະລຸນາລອງໃໝ່';
+}
+
+// Disables a resend button and shows a live mm:ss countdown on it until
+// `ms` has elapsed, then restores its original label and re-enables it.
+function startResendCooldown(btn, ms, idleLabel) {
+  if (!btn) return;
+  const original = idleLabel || btn.textContent;
+  const endAt = Date.now() + ms;
+  btn.disabled = true;
+  const tick = () => {
+    const remaining = endAt - Date.now();
+    if (remaining <= 0) {
+      btn.textContent = original;
+      btn.disabled = false;
+      return;
+    }
+    const totalSec = Math.ceil(remaining / 1000);
+    const mm = Math.floor(totalSec / 60);
+    const ss = String(totalSec % 60).padStart(2, '0');
+    btn.textContent = `ລໍຖ້າ ${mm}:${ss}`;
+    setTimeout(tick, 1000);
+  };
+  tick();
+}
+const OTP_RESEND_COOLDOWN_MS = 5 * 60 * 1000; // resend button cooldown: 5 minutes
+
+// Local-only keys that remain in localStorage even after moving to Supabase:
+// small per-device UI/scheduler bookkeeping that doesn't need to sync.
+const LS_KEYS = {
+  notifTime: 'dayframe_notif_time',
+};
+
+const QUOTES = [
+  "ກ້າວນ້ອຍໆ ທີ່ເຮັດຊ້ຳທຸກວັນ ໄປໄດ້ໄກກວ່າແຜນໃຫຍ່ທີ່ເຮັດແຕ່ຄັ້ງດຽວ",
+  "ເຈົ້າບໍ່ຈຳເປັນຕ້ອງມີວັນທີ່ສົມບູນແບບ ພຽງແຕົໜຶ່ງຊົ່ວໂມງທີ່ຕັ້ງໃຈຈິງກໍພໍ",
+  "ຄວາມຄືບໜ້າເຊື່ອງຢູ່ໃນກິດຈະວັດທີ່ດູໜ້າເບື່ອ ແລະ ເຮັດຊ້ຳໆ",
+  "ເລີ່ມກ່ອນທີ່ຈະຮູ້ສຶກພ້ອມ ເພາະຄວາມພ້ອມຄືພາບລວງຕາ",
+  "ຕົວເຈົ້າໃນອີກໜຶ່ງປີຂ້າງໜ້າ ຖືກສ້າງຂຶ້ນຈາກວັນນີ້",
+  "ລະບຽບວິໄນຄືສັນຍາທີ່ເຈົ້າໃຫ້ໄວ້ກັບຕົວເຈົ້າເອງ",
+  "ການພັກຜ່ອນກໍເປັນສ່ວນໜຶ່ງຂອງວຽກ ບໍ່ແມ່ນການຢຸດຈາກວຽກ",
+  "ຄວາມຊັດເຈນເກີດຈາກການລົງມືເຮັດ ບໍ່ແມ່ນການຄິດຫຼາຍຂຶ້ນ",
+  "ສະຖິຕິຕໍ່ເນື່ອງຂອງເຈົ້າບໍ່ໄດ້ຢູ່ທີ່ຄວາມສົມບູນ ແຕ່ຢູ່ທີ່ການກັບມາເຮັດຕໍ່",
+  "ພຽງເຮັດສິ່ງທີ່ຖືກຕ້ອງໃນລຳດັບຕໍ່ໄປ ນັ້ນຄືລະບົບທັງໝົດ",
+  "ພະລັງງານໄຫຼຕາມຄວາມສົນໃຈ ໃຊ້ມັນຢ່າງມີເປົ້າໝາຍ",
+  "ລາຍການທີ່ເປັນລະບຽບຄືໃຈທີ່ສະຫງົບ",
+  "ເຈົ້າຫ່າງຈາກແຮງສົ່ງພຽງໜຶ່ງຊ່ວງເວລາທີ່ຕັ້ງໃຈເຮັດຈິງໆ",
+  "ຄວາມສະໝ່ຳສະເໝີຄືຄວາມກ້າຫານແບບງຽບໆ",
+  "ວັນນີ້ພຽງຕ້ອງດີກວ່າຄ່າສະເລ່ຍໜ້ອຍໜຶ່ງກໍພໍແລ້ວ",
+];
+
+const TASK_CATS = [
+  { id: 'ສ່ວນຕົວ', color: 'teal' },
+  { id: 'ວຽກ', color: 'brass' },
+  { id: 'ຮຽນ', color: 'violet' },
+];
+const PRIORITIES = [
+  { id: 'ສູງ', color: 'coral' },
+  { id: 'ກາງ', color: 'brass' },
+  { id: 'ຕ່ຳ', color: 'teal' },
+];
+const FIN_CATS_EXPENSE = ['ອາຫານ', 'ທ່ອງທ່ຽວ', 'ບິນ', 'ຊ໊ອບປິ້ງ', 'ສຸຂະພາບ', 'ອື່ນໆ'];
+const FIN_CATS_INCOME = ['ເງິນເດືອນ', 'ຟຣີແລນ', 'ຂອງຂວັນ', 'ການລົງທຶນ', 'ອື່ນໆ'];
+const HABIT_ICONS = ['droplet', 'dumbbell', 'book-open', 'code-2', 'moon-star', 'footprints', 'apple', 'pencil', 'brain', 'sprout'];
+const EMOJI_AVATARS = ['😀', '😎', '🚀', '🌵', '🐱', '🦊', '🌟', '🍀', '🎧', '📚', '☕', '🔥'];
+
+/* ---------------- WEATHER (real, via geolocation + Open-Meteo) ---------------- */
+
+const WEATHER_CODES = {
+  0: { icon: 'sun', label: 'ຟ້າແຈ່ມໃສ' },
+  1: { icon: 'cloud-sun', label: 'ຟ້າໂປ່ງ' },
+  2: { icon: 'cloud-sun', label: 'ມີເມກບາງສ່ວນ' },
+  3: { icon: 'cloud', label: 'ມີເມກຫຼາຍ' },
+  45: { icon: 'cloud-fog', label: 'ໝອກ' },
+  48: { icon: 'cloud-fog', label: 'ໝອກນ້ຳກ້ອນ' },
+  51: { icon: 'cloud-drizzle', label: 'ຝົນລົງເບົາໆ' },
+  53: { icon: 'cloud-drizzle', label: 'ຝົນລົງ' },
+  55: { icon: 'cloud-drizzle', label: 'ຝົນລົງໜັກ' },
+  56: { icon: 'cloud-drizzle', label: 'ຝົນລົງໜາວ' },
+  57: { icon: 'cloud-drizzle', label: 'ຝົນລົງໜາວໜັກ' },
+  61: { icon: 'cloud-rain', label: 'ຝົນຕົກໜ້ອຍ' },
+  63: { icon: 'cloud-rain', label: 'ຝົນຕົກ' },
+  65: { icon: 'cloud-rain', label: 'ຝົນຕົກໜັກ' },
+  66: { icon: 'cloud-rain', label: 'ຝົນໜາວ' },
+  67: { icon: 'cloud-rain', label: 'ຝົນໜາວໜັກ' },
+  71: { icon: 'snowflake', label: 'ຫິມະຕົກໜ້ອຍ' },
+  73: { icon: 'snowflake', label: 'ຫິມະຕົກ' },
+  75: { icon: 'snowflake', label: 'ຫິມະຕົກໜັກ' },
+  77: { icon: 'snowflake', label: 'ເກັດຫິມະ' },
+  80: { icon: 'cloud-rain-wind', label: 'ຝົນຕົກເປັນຊ່ວງ' },
+  81: { icon: 'cloud-rain-wind', label: 'ຝົນຕົກເປັນຊ່ວງປານກາງ' },
+  82: { icon: 'cloud-rain-wind', label: 'ຝົນຕົກເປັນຊ່ວງໜັກ' },
+  85: { icon: 'cloud-snow', label: 'ຫິມະຕົກເປັນຊ່ວງ' },
+  86: { icon: 'cloud-snow', label: 'ຫິມະຕົກເປັນຊ່ວງໜັກ' },
+  95: { icon: 'cloud-lightning', label: 'ພະຍຸຝົນຟ້າຄະນອງ' },
+  96: { icon: 'cloud-lightning', label: 'ພະຍຸຝົນຟ້າຄະນອງມີລູກເຫັບ' },
+  99: { icon: 'cloud-lightning', label: 'ພະຍຸຝົນຟ້າຄະນອງຮຸນແຮງ' },
+};
+function weatherMeta(code) { return WEATHER_CODES[code] || { icon: 'cloud', label: 'ບໍ່ຮູ້ສະພາບອາກາດ' }; }
+
+function getPosition() {
+  return new Promise((resolve, reject) => {
+    if (!('geolocation' in navigator)) { reject(new Error('no geolocation')); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude, approx: false }),
+      () => reject(new Error('denied')),
+      { timeout: 8000, maximumAge: 600000 }
+    );
+  });
+}
+
+async function loadWeather() {
+  state.weatherStatus = 'loading';
+  let lat, lon, approx = false;
+  try {
+    const pos = await getPosition();
+    lat = pos.lat; lon = pos.lon;
+  } catch (err) {
+    // Fallback to Vientiane
+    lat = 17.9757; lon = 102.6331; approx = true;
+  }
+
+  try {
+    const [weatherRes, placeRes] = await Promise.allSettled([
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`),
+      fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=lo`),
+    ]);
+
+    if (weatherRes.status !== 'fulfilled' || !weatherRes.value.ok) throw new Error('weather fetch failed');
+    const weatherData = await weatherRes.value.json();
+
+    let place = approx ? 'ວຽງຈັນ (ໂດຍປະມານ)' : 'ຕຳແໜ່ງຂອງທ່ານ';
+    if (placeRes.status === 'fulfilled' && placeRes.value.ok) {
+      try {
+        const placeData = await placeRes.value.json();
+        const city = placeData.locality || placeData.city || placeData.principalSubdivision;
+        if (city) place = approx ? `${city} (ໂດຍປະມານ)` : city;
+      } catch (_) {}
+    }
+
+    state.weather = {
+      temp: Math.round(weatherData.current.temperature_2m),
+      code: weatherData.current.weather_code,
+      place,
+    };
+    state.weatherStatus = 'ready';
+  } catch (err) {
+    state.weatherStatus = 'error';
+  }
+
+  if (state.view === 'dashboard' && !document.getElementById('app-shell').classList.contains('hidden')) render();
+}
+
+/* ---------------- NOTIFICATIONS ---------------- */
+
+function requestNotifPermission() {
+  if (typeof Notification === 'undefined') { toast('ບຣາວເຊີນີ້ບໍ່ຮອງຮັບການແຈ້ງເຕືອນ'); return; }
+  if (Notification.permission === 'granted') {
+    state.notifStatus = 'granted';
+    sendTaskNotification();
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    toast('ການແຈ້ງເຕືອນຖືກປິດ — ກະລຸນາເປີດໃນການຕັ້ງຄ່າບຣາວເຊີ');
+    return;
+  }
+  Notification.requestPermission().then((perm) => {
+    state.notifStatus = perm;
+    render();
+    if (perm === 'granted') { toast('ເປີດການແຈ້ງເຕືອນແລ້ວ'); sendTaskNotification(); }
+  });
+}
+
+// Actually fires a browser Notification summarizing today's due/overdue tasks.
+// This is just "what to say" — timing/dedupe live in scheduledNotifCheck() below.
+function sendTaskNotification() {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const dueToday = state.tasks.filter((t) => !t.done && t.date === todayISO());
+  const overdue = state.tasks.filter((t) => !t.done && t.date < todayISO());
+  if (overdue.length > 0) {
+    new Notification('Dayframe — ວຽກຄ້າງເກີນກຳນົດ', { body: `ທ່ານມີ ${overdue.length} ວຽກທີ່ເກີນກຳນົດແລ້ວ` });
+  } else if (dueToday.length > 0) {
+    new Notification('Dayframe — ວຽກວັນນີ້', { body: `ທ່ານມີ ${dueToday.length} ວຽກທີ່ຕ້ອງເຮັດວັນນີ້` });
+  }
+}
+
+// Checked once a minute while the app is open. As soon as the local clock
+// reaches the user's chosen notifTime, fire one notification for that day
+// (deduped per user/day so it won't repeat every minute after it triggers).
+// NOTE: this can only run while the page/PWA is actually open (foreground or
+// backgrounded tab) — there's no backend here, so a fully closed browser or a
+// locked phone with the app swiped away will not receive it.
+let _notifSchedulerId = null;
+function scheduledNotifCheck() {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  if (!state.user) return;
+  const target = state.notifTime || '09:00';
+  const now = new Date();
+  const nowHM = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  const dedupeKey = 'dayframe_notif_check:' + state.user.email;
+  const lastCheck = localStorage.getItem(dedupeKey);
+  if (nowHM >= target && lastCheck !== todayISO()) {
+    localStorage.setItem(dedupeKey, todayISO());
+    sendTaskNotification();
+  }
+}
+function startNotifScheduler() {
+  stopNotifScheduler();
+  scheduledNotifCheck(); // catch up immediately in case today's time already passed
+  _notifSchedulerId = setInterval(scheduledNotifCheck, 60 * 1000);
+}
+function stopNotifScheduler() {
+  if (_notifSchedulerId) { clearInterval(_notifSchedulerId); _notifSchedulerId = null; }
+}
+
+
+let state = {
+  view: 'dashboard',
+  authTab: 'login',
+  signupStep: 'form',
+  user: null,
+  tasks: [],
+  finance: [],
+  goal: { target: 20000, saved: 0 },
+  notes: [],
+  habits: [],
+  taskFilter: 'ທັງໝົດ',
+  taskDateFilter: null,
+  noteSearch: '',
+  noteTagFilter: null,
+  noteEditingId: null,
+  weather: null,
+  weatherStatus: 'loading',
+  budget: { monthly: 0 },
+  weekOffset: 0,
+  searchOpen: false,
+  searchQuery: '',
+  notifStatus: (typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'),
+  notifTime: '09:00',
+  expandedTasks: {},
+  habitHeatmap: false,
+  showMonthCalendar: true,
+  calendarMonthOffset: 0,
+};
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+// IMPORTANT: never use Date#toISOString() for "what calendar date is it" — that
+// converts to UTC and silently shifts the date by a day for anyone not in UTC+0
+// (e.g. in Laos, UTC+7, every hour between local midnight and 7am would read as
+// "yesterday"). This formats using the LOCAL year/month/day instead.
+const toLocalISODate = (d) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+const todayISO = () => toLocalISODate(new Date());
+const fmtMoney = (n) => (n < 0 ? '-' : '') + '₭' + Math.abs(n).toLocaleString('lo-LA', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const fmtDateShort = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('lo-LA', { month: 'short', day: 'numeric' });
+const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---------------- CLOUD DATA SYNC (Supabase) ----------------
+   All of a user's app data (tasks/finance/notes/habits/goal/budget) lives
+   in ONE row per user in the `user_data` table (see supabase-schema.sql),
+   as JSONB columns. This keeps the rewrite small: every place in this file
+   that reads/writes `state.tasks`, `state.finance`, etc. is untouched —
+   only saveAll()/loadUserData() below changed from localStorage to a
+   network call. Row Level Security in the schema guarantees a user can
+   only ever read/write their OWN row (auth.uid() = user_id). */
+let _saveInFlight = false;
+let _savePending = false;
+async function saveAll() {
+  if (!state.user || !sbClient) return;
+  // Coalesce rapid-fire saves (e.g. toggling several habit days quickly)
+  // into a single network request instead of racing many upserts.
+  if (_saveInFlight) { _savePending = true; return; }
+  _saveInFlight = true;
+  const payload = {
+    user_id: state.user.id,
+    tasks: state.tasks,
+    finance: state.finance,
+    goal: state.goal,
+    notes: state.notes,
+    habits: state.habits,
+    budget: state.budget,
+    notif_time: state.notifTime || '09:00',
+    updated_at: new Date().toISOString(),
+  };
+  localStorage.setItem(LS_KEYS.notifTime, state.notifTime || '09:00');
+  try {
+    const { error } = await sbClient.from('user_data').upsert(payload);
+    if (error) toast('ບັນທຶກຂຶ້ນ cloud ບໍ່ສຳເລັດ — ' + error.message, 5000);
+  } catch (e) {
+    toast('ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ, ບໍ່ສາມາດບັນທຶກໄດ້ໃນຕອນນີ້', 5000);
+  } finally {
+    _saveInFlight = false;
+    if (_savePending) { _savePending = false; saveAll(); }
+  }
+}
+
+async function loadUserData(userId) {
+  const empty = () => {
+    state.tasks = []; state.finance = []; state.goal = { target: 20000, saved: 0 };
+    state.notes = []; state.habits = []; state.budget = { monthly: 0 };
+    state.notifTime = localStorage.getItem(LS_KEYS.notifTime) || '09:00';
+  };
+  if (!sbClient) { empty(); return; }
+  try {
+    const { data, error } = await sbClient.from('user_data').select('*').eq('user_id', userId).maybeSingle();
+    if (error) { toast('ໂຫລດຂໍ້ມູນຈາກ cloud ບໍ່ສຳເລັດ — ' + error.message, 5000); empty(); return; }
+    if (!data) { empty(); return; }
+    state.tasks = data.tasks || [];
+    state.finance = data.finance || [];
+    state.goal = data.goal || { target: 20000, saved: 0 };
+    state.notes = data.notes || [];
+    state.habits = data.habits || [];
+    state.budget = data.budget || { monthly: 0 };
+    state.notifTime = data.notif_time || '09:00';
+  } catch (e) {
+    toast('ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ, ໂຫລດຂໍ້ມູນຈາກ cloud ບໍ່ໄດ້', 5000);
+    empty();
+  }
+}
+
+/* ---------------- AUTH ---------------- */
+// Email address changes are intentionally NOT supported in this modal:
+// Supabase requires re-confirming both the old and new address, which is
+// a separate flow from what's built here. The email field is shown
+// read-only; only display name and avatar are editable.
+async function saveProfileChanges(name, avatar) {
+  try {
+    const { data, error } = await sbClient.auth.updateUser({ data: { name, avatar } });
+    if (error) return supaErrorMessage(error);
+    state.user.name = name;
+    state.user.avatar = avatar;
+    return null;
+  } catch (e) {
+    return supaErrorMessage(e);
+  }
+}
+
+async function changePassword(currentPw, newPw) {
+  try {
+    // Supabase's client SDK has no direct "verify current password" call,
+    // so we re-authenticate with it first to confirm it's correct.
+    const { error: signInErr } = await sbClient.auth.signInWithPassword({ email: state.user.email, password: currentPw });
+    if (signInErr) return 'ລະຫັດຜ່ານປັດຈຸບັນບໍ່ຖືກຕ້ອງ';
+    const { error } = await sbClient.auth.updateUser({ password: newPw });
+    if (error) return supaErrorMessage(error);
+    return null;
+  } catch (e) {
+    return supaErrorMessage(e);
+  }
+}
+
+function resizeImageFile(file, maxSize) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxSize) { height = Math.round(height * (maxSize / width)); width = maxSize; }
+        else if (height > maxSize) { width = Math.round(width * (maxSize / height)); height = maxSize; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function openProfileModal() {
+  let selectedAvatar = state.user.avatar || null;
+  document.getElementById('modal-root').innerHTML = modalShell('ແກ້ໄຂໂປຣໄຟລ໌', `
+    <div class="space-y-4">
+      <div class="flex flex-col items-center gap-3">
+        <button type="button" id="avatar-preview-btn">${avatarHtml(state.user, 'w-20 h-20 text-2xl')}</button>
+        <input type="file" id="avatar-file-input" accept="image/*" class="hidden" />
+        <div class="flex gap-2">
+          <button type="button" id="avatar-upload-btn" class="text-xs text-brass border border-line rounded-lg px-3 py-1.5">ອັບໂຫລດຮູບ</button>
+          <button type="button" id="avatar-remove-btn" class="text-xs text-inkdim border border-line rounded-lg px-3 py-1.5 ${!selectedAvatar ? 'hidden' : ''}">ລບຮູບ</button>
+        </div>
+        <div class="flex flex-wrap gap-2 justify-center max-w-[280px]">
+          ${EMOJI_AVATARS.map((e) => `<button type="button" data-emoji="${e}" class="emoji-avatar-btn w-9 h-9 rounded-full bg-surface2 border border-line grid place-items-center text-base hover:border-brass transition-colors">${e}</button>`).join('')}
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ຊື່ທີ່ສະແດງຜົນ</label>
+        <input required id="mf-name" value="${escapeHtml(state.user.name)}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ອີເມວ</label>
+        <input disabled type="email" id="mf-email" value="${escapeHtml(state.user.email)}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm text-inkfaint cursor-not-allowed" />
+        <p class="text-inkfaint text-[11px] mt-1">ຍັງບໍ່ຮອງຮັບການປ່ຽນອີເມວໃນເວີຊັນນີ້</p>
+      </div>
+      <p id="profile-error" class="text-coral text-xs hidden"></p>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-1 active:scale-[0.98] transition-transform">ບັນທຶກການປ່ຽນແປງ</button>
+      <button type="button" data-action="open-password-modal" class="w-full border border-line text-inkdim hover:text-ink rounded-xl py-3 text-sm transition-colors">ປ່ຽນລະຫັດຜ່ານ</button>
+    </div>
+  `, 'modal-form');
+  lucide.createIcons();
+
+  const preview = document.getElementById('avatar-preview-btn');
+  const fileInput = document.getElementById('avatar-file-input');
+  const removeBtn = document.getElementById('avatar-remove-btn');
+
+  const refreshPreview = () => {
+    preview.innerHTML = avatarHtml({ name: document.getElementById('mf-name').value, avatar: selectedAvatar }, 'w-20 h-20 text-2xl');
+    removeBtn.classList.toggle('hidden', !selectedAvatar);
+  };
+
+  preview.addEventListener('click', () => fileInput.click());
+  document.getElementById('avatar-upload-btn').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    try {
+      selectedAvatar = await resizeImageFile(file, 256);
+      refreshPreview();
+    } catch (_) { toast('ບໍ່ສາມາດໂຫລດຮູບພາບນີ້ໄດ້'); }
+  });
+  removeBtn.addEventListener('click', () => { selectedAvatar = null; refreshPreview(); });
+  document.querySelectorAll('.emoji-avatar-btn').forEach((btn) => {
+    btn.addEventListener('click', () => { selectedAvatar = 'emoji:' + btn.dataset.emoji; refreshPreview(); });
+  });
+
+  document.getElementById('modal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('mf-name').value.trim();
+    const errEl = document.getElementById('profile-error');
+    if (!name) return;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    const err = await saveProfileChanges(name, selectedAvatar);
+    if (submitBtn) submitBtn.disabled = false;
+    if (err) { errEl.textContent = err; errEl.classList.remove('hidden'); return; }
+    closeModal(); buildNav(); render(); toast('ອັບເດດໂປຣໄຟລ໌ແລ້ວ');
+  });
+}
+
+function openPasswordModal() {
+  document.getElementById('modal-root').innerHTML = modalShell('ປ່ຽນລະຫັດຜ່ານ', `
+    <div class="space-y-3">
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດຜ່ານປັດຈຸບັນ</label>
+        <input required type="password" id="mf-current-pw" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດຜ່ານໃໝ່</label>
+        <input required minlength="4" type="password" id="mf-new-pw" placeholder="ຢ່າງໜ້ອຍ 4 ຕົວອັກສອນ" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ຢືນຢັນລະຫັດຜ່ານໃໝ່</label>
+        <input required minlength="4" type="password" id="mf-confirm-pw" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <p id="password-error" class="text-coral text-xs hidden"></p>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-1 active:scale-[0.98] transition-transform">ບັນທຶກລະຫັດຜ່ານໃໝ່</button>
+    </div>
+  `, 'modal-form');
+  lucide.createIcons();
+  document.getElementById('modal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cur = document.getElementById('mf-current-pw').value;
+    const next = document.getElementById('mf-new-pw').value;
+    const confirm = document.getElementById('mf-confirm-pw').value;
+    const errEl = document.getElementById('password-error');
+    if (next !== confirm) { errEl.textContent = 'ລະຫັດຜ່ານໃໝ່ບໍ່ກົງກັນ'; errEl.classList.remove('hidden'); return; }
+    const err = await changePassword(cur, next);
+    if (err) { errEl.textContent = err; errEl.classList.remove('hidden'); return; }
+    closeModal(); toast('ປ່ຽນລະຫັດຜ່ານແລ້ວ');
+  });
+}
+
+function setAuthTab(tab) {
+  state.authTab = tab;
+  if (tab === 'login' && state.signupStep === 'otp') resetSignupForm();
+  document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('signup-form').classList.toggle('hidden', tab !== 'signup');
+  document.getElementById('tab-login').className = 'flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ' + (tab === 'login' ? 'bg-brass text-bg' : 'text-inkdim');
+  document.getElementById('tab-signup').className = 'flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ' + (tab === 'signup' ? 'bg-brass text-bg' : 'text-inkdim');
+}
+
+async function doLogin(email, password, silent) {
+  const err = document.getElementById('login-error');
+  if (!sbClient) {
+    err.textContent = supaErrorMessage(null);
+    err.classList.remove('hidden');
+    return false;
+  }
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    err.textContent = 'ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
+    err.classList.remove('hidden');
+    return false;
+  }
+  err.classList.add('hidden');
+  const meta = data.user.user_metadata || {};
+  state.user = { id: data.user.id, email: data.user.email, name: meta.name || data.user.email, avatar: meta.avatar || null };
+  await loadUserData(state.user.id);
+  enterApp();
+  return true;
+}
+
+/* ---------------- SIGNUP: EMAIL OTP VERIFICATION ----------------
+   Step 1 (startSignupOtp): create the (unconfirmed) account directly with
+   Supabase Auth — it stores the password securely server-side and emails a
+   6-digit OTP code (see the Supabase Email Template setup note near the top
+   of this file). Step 2 (verifySignupOtp): Supabase checks the code and
+   confirms + logs the account in. */
+let _pendingSignup = null; // { name, email } — only used to support "resend"/"back"
+function setSignupBusy(busy, label) {
+  const btn = document.getElementById('signup-submit-btn');
+  if (!btn) return;
+  btn.disabled = busy;
+  if (label) btn.textContent = label;
+}
+
+function showSignupOtpStep(email) {
+  state.signupStep = 'otp';
+  document.getElementById('signup-fields').classList.add('hidden');
+  document.getElementById('signup-otp-fields').classList.remove('hidden');
+  document.getElementById('signup-otp-email-label').textContent = email;
+  document.getElementById('signup-otp').value = '';
+  document.getElementById('signup-submit-btn').textContent = 'ຢືນຢັນ ແລະ ສ້າງບັນຊີ';
+  // Hidden fields must not stay "required" or the browser silently blocks
+  // submit (can't focus a hidden invalid control) with no visible error.
+  document.getElementById('signup-name').required = false;
+  document.getElementById('signup-email').required = false;
+  document.getElementById('signup-password').required = false;
+  document.getElementById('signup-otp').required = true;
+  document.getElementById('signup-otp').focus();
+}
+
+function backToSignupFields() {
+  state.signupStep = 'form';
+  _pendingSignup = null;
+  document.getElementById('signup-otp-fields').classList.add('hidden');
+  document.getElementById('signup-fields').classList.remove('hidden');
+  document.getElementById('signup-submit-btn').textContent = 'ສ້າງບັນຊີ';
+  document.getElementById('signup-error').classList.add('hidden');
+  document.getElementById('signup-otp').required = false;
+  document.getElementById('signup-name').required = true;
+  document.getElementById('signup-email').required = true;
+  document.getElementById('signup-password').required = true;
+}
+
+function resetSignupForm() {
+  state.signupStep = 'form';
+  document.getElementById('signup-form').reset();
+  document.getElementById('signup-otp-fields').classList.add('hidden');
+  document.getElementById('signup-fields').classList.remove('hidden');
+  document.getElementById('signup-submit-btn').textContent = 'ສ້າງບັນຊີ';
+  document.getElementById('signup-otp').required = false;
+  document.getElementById('signup-name').required = true;
+  document.getElementById('signup-email').required = true;
+  document.getElementById('signup-password').required = true;
+}
+
+async function startSignupOtp(name, email, password) {
+  const err = document.getElementById('signup-error');
+  err.classList.add('hidden');
+  if (!name || !email || !password) return;
+  if (!sbClient) { err.textContent = supaErrorMessage(null); err.classList.remove('hidden'); return; }
+  setSignupBusy(true, 'ກຳລັງສົ່ງລະຫັດ...');
+  try {
+    const { error } = await sbClient.auth.signUp({ email, password, options: { data: { name, avatar: null } } });
+    if (error) {
+      err.textContent = error.message && error.message.toLowerCase().includes('already') ? 'ມີບັນຊີທີ່ໃຊ້ອີເມວນີ້ຢູ່ແລ້ວ' : supaErrorMessage(error);
+      err.classList.remove('hidden');
+      return;
+    }
+    _pendingSignup = { name, email };
+    showSignupOtpStep(email);
+    toast('ສົ່ງລະຫັດ OTP ໄປທີ່ ' + email + ' ແລ້ວ');
+  } catch (e) {
+    err.textContent = supaErrorMessage(e);
+    err.classList.remove('hidden');
+  } finally {
+    setSignupBusy(false, state.signupStep === 'otp' ? 'ຢືນຢັນ ແລະ ສ້າງບັນຊີ' : 'ສ້າງບັນຊີ');
+  }
+}
+
+async function resendSignupOtp() {
+  const err = document.getElementById('signup-error');
+  if (!_pendingSignup) { backToSignupFields(); return; }
+  const resendBtn = document.getElementById('signup-resend-btn');
+  const idleLabel = resendBtn.textContent;
+  resendBtn.disabled = true;
+  try {
+    const { error } = await sbClient.auth.resend({ type: 'signup', email: _pendingSignup.email });
+    if (error) throw error;
+    toast('ສົ່ງລະຫັດ OTP ໃໝ່ແລ້ວ');
+  } catch (e) {
+    err.textContent = supaErrorMessage(e);
+    err.classList.remove('hidden');
+  } finally {
+    startResendCooldown(resendBtn, OTP_RESEND_COOLDOWN_MS, idleLabel);
+  }
+}
+
+async function verifySignupOtp(code) {
+  const err = document.getElementById('signup-error');
+  err.classList.add('hidden');
+  if (!_pendingSignup) {
+    err.textContent = 'ໝົດເວລາ, ກະລຸນາລົງທະບຽນໃໝ່';
+    err.classList.remove('hidden');
+    backToSignupFields();
+    return;
+  }
+  if (!code) { err.textContent = 'ລະຫັດ OTP ບໍ່ຖືກຕ້ອງ'; err.classList.remove('hidden'); return; }
+  const { data, error } = await sbClient.auth.verifyOtp({ email: _pendingSignup.email, token: code, type: 'signup' });
+  if (error) {
+    err.textContent = 'ລະຫັດ OTP ບໍ່ຖືກຕ້ອງ ຫຼື ໝົດອາຍຸແລ້ວ';
+    err.classList.remove('hidden');
+    return;
+  }
+  const name = _pendingSignup.name;
+  const meta = data.user.user_metadata || {};
+  state.user = { id: data.user.id, email: data.user.email, name: meta.name || name, avatar: meta.avatar || null };
+  await loadUserData(state.user.id);
+  toast('ຍິນດີຕ້ອນຮັບ, ' + name.split(' ')[0] + '!');
+  _pendingSignup = null;
+  resetSignupForm();
+  enterApp();
+}
+
+/* ---------------- FORGOT PASSWORD: EMAIL OTP RESET ----------------
+   Handled entirely by Supabase Auth now — see openForgotPasswordModal and
+   openForgotPasswordOtpModal below, which call sbClient.auth
+   resetPasswordForEmail / verifyOtp / updateUser directly. */
+
+function openForgotPasswordModal() {
+  document.getElementById('modal-root').innerHTML = modalShell('ລືມລະຫັດຜ່ານ', `
+    <div class="space-y-3">
+      <p class="text-inkdim text-xs">ປ້ອນອີເມວທີ່ໃຊ້ສະໝັກໄວ້, ພວກເຮົາຈະສົ່ງລະຫັດ OTP ໄປໃຫ້ຢືນຢັນ</p>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ອີເມວ</label>
+        <input required type="email" id="fp-email" placeholder="you@example.com" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <p id="fp-error" class="text-coral text-xs hidden"></p>
+      <button type="submit" id="fp-submit-btn" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-1 active:scale-[0.98] transition-transform">ສົ່ງລະຫັດ OTP</button>
+    </div>
+  `, 'modal-form');
+  lucide.createIcons();
+  document.getElementById('modal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('fp-email').value.trim().toLowerCase();
+    const err = document.getElementById('fp-error');
+    err.classList.add('hidden');
+    const btn = document.getElementById('fp-submit-btn');
+    btn.disabled = true; btn.textContent = 'ກຳລັງສົ່ງ...';
+    try {
+      // Supabase intentionally does not reveal whether the email exists
+      // (prevents account enumeration) — it always reports success here.
+      const { error } = await sbClient.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      toast('ຖ້າມີບັນຊີທີ່ໃຊ້ອີເມວນີ້, ລະຫັດ OTP ຈະຖືກສົ່ງໄປໃຫ້ແລ້ວ');
+      openForgotPasswordOtpModal(email);
+    } catch (e2) {
+      err.textContent = supaErrorMessage(e2);
+      err.classList.remove('hidden');
+      btn.disabled = false; btn.textContent = 'ສົ່ງລະຫັດ OTP';
+    }
+  });
+}
+
+function openForgotPasswordOtpModal(email) {
+  document.getElementById('modal-root').innerHTML = modalShell('ຢືນຢັນ OTP', `
+    <div class="space-y-3">
+      <p class="text-inkdim text-xs">ປ້ອນລະຫັດ 6 ຕົວທີ່ສົ່ງໄປທີ່ <span class="text-ink">${escapeHtml(email)}</span></p>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດ OTP</label>
+        <input required maxlength="8" pattern="[0-9]{6,8}" inputmode="numeric" autocomplete="one-time-code" id="fp-otp" placeholder="12345678" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm tracking-[0.3em] text-center focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ລະຫັດຜ່ານໃໝ່</label>
+        <input required minlength="4" type="password" id="fp-new-pw" placeholder="ຢ່າງໜ້ອຍ 4 ຕົວອັກສອນ" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm placeholder:text-inkfaint focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ຢືນຢັນລະຫັດຜ່ານໃໝ່</label>
+        <input required minlength="4" type="password" id="fp-confirm-pw" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <p id="fp-otp-error" class="text-coral text-xs hidden"></p>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-1 active:scale-[0.98] transition-transform">ຕັ້ງລະຫັດຜ່ານໃໝ່</button>
+      <button type="button" id="fp-resend-btn" class="w-full text-xs text-brass py-1">ສົ່ງລະຫັດ OTP ອີກຄັ້ງ</button>
+    </div>
+  `, 'modal-form');
+  lucide.createIcons();
+  document.getElementById('modal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('fp-otp-error');
+    err.classList.add('hidden');
+    const code = document.getElementById('fp-otp').value.trim();
+    const newPw = document.getElementById('fp-new-pw').value;
+    const confirmPw = document.getElementById('fp-confirm-pw').value;
+    if (newPw !== confirmPw) {
+      err.textContent = 'ລະຫັດຜ່ານໃໝ່ບໍ່ກົງກັນ';
+      err.classList.remove('hidden');
+      return;
+    }
+    // verifyOtp with type 'recovery' both confirms the code AND signs the
+    // user into a temporary recovery session, which is required before
+    // Supabase will let us call updateUser({ password }).
+    const { error: verifyErr } = await sbClient.auth.verifyOtp({ email, token: code, type: 'recovery' });
+    if (verifyErr) {
+      err.textContent = 'ລະຫັດ OTP ບໍ່ຖືກຕ້ອງ ຫຼື ໝົດອາຍຸແລ້ວ';
+      err.classList.remove('hidden');
+      return;
+    }
+    const { error: updateErr } = await sbClient.auth.updateUser({ password: newPw });
+    if (updateErr) {
+      err.textContent = supaErrorMessage(updateErr);
+      err.classList.remove('hidden');
+      return;
+    }
+    await sbClient.auth.signOut();
+    closeModal();
+    toast('ຕັ້ງລະຫັດຜ່ານໃໝ່ສຳເລັດແລ້ວ, ກະລຸນາເຂົ້າສູ່ລະບົບ');
+    setAuthTab('login');
+    document.getElementById('login-email').value = email;
+    document.getElementById('login-password').focus();
+  });
+  document.getElementById('fp-resend-btn').addEventListener('click', async () => {
+    const resendBtn = document.getElementById('fp-resend-btn');
+    const idleLabel = resendBtn.textContent;
+    resendBtn.disabled = true;
+    try {
+      const { error } = await sbClient.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      toast('ສົ່ງລະຫັດ OTP ໃໝ່ແລ້ວ');
+    } catch (e3) {
+      toast(supaErrorMessage(e3));
+    } finally {
+      startResendCooldown(resendBtn, OTP_RESEND_COOLDOWN_MS, idleLabel);
+    }
+  });
+}
+
+async function logout() {
+  stopNotifScheduler();
+  if (sbClient) await sbClient.auth.signOut();
+  state.user = null;
+  document.getElementById('app-shell').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  setAuthTab('login');
+  document.getElementById('login-form').reset();
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  state.view = 'dashboard';
+  buildNav();
+  render();
+  loadWeather();
+  startNotifScheduler();
+}
+
+/* ---------------- NAV ---------------- */
+
+const NAV_ITEMS = [
+  { id: 'dashboard', label: 'ໜ້າຫຼັກ', icon: 'layout-dashboard' },
+  { id: 'tasks', label: 'ວຽກ', icon: 'list-todo' },
+  { id: 'finance', label: 'ການເງິນ', icon: 'wallet' },
+  { id: 'notes', label: 'ບັນທຶກ', icon: 'notebook-pen' },
+  { id: 'habits', label: 'ນິໄສ', icon: 'flame' },
+];
+
+function buildNav() {
+  const bottom = document.getElementById('bottom-nav');
+  bottom.innerHTML = NAV_ITEMS.map((item) => `
+    <button data-action="set-view" data-view="${item.id}" class="nav-btn flex-1 flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl text-[10.5px] transition-colors ${state.view === item.id ? 'text-brass' : 'text-inkfaint'}">
+      <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+      <span class="font-medium">${item.label}</span>
+    </button>
+  `).join('');
+
+  const sidebar = document.getElementById('sidebar-nav');
+  sidebar.innerHTML = NAV_ITEMS.map((item) => `
+    <button data-action="set-view" data-view="${item.id}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${state.view === item.id ? 'bg-surface text-ink font-medium' : 'text-inkdim hover:text-ink hover:bg-surface'}">
+      <i data-lucide="${item.icon}" class="w-4 h-4"></i> ${item.label}
+    </button>
+  `).join('');
+
+  lucide.createIcons();
+}
+
+function setView(v) {
+  state.view = v;
+  buildNav();
+  render();
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+}
+
+/* ---------------- RENDER ROOT ---------------- */
+
+function render() {
+  const root = document.getElementById('view-root');
+  const renderers = {
+    dashboard: renderDashboard,
+    tasks: renderTasks,
+    finance: renderFinance,
+    notes: renderNotes,
+    habits: renderHabits,
+    settings: renderSettings,
+  };
+  root.innerHTML = `<div class="fade-in">${(renderers[state.view] || renderDashboard)()}</div>`;
+  lucide.createIcons();
+  wireViewSpecificEvents();
+}
+
+/* ---------------- DASHBOARD ---------------- */
+
+function dayProgressPct() {
+  const now = new Date();
+  return Math.round(((now.getHours() * 60 + now.getMinutes()) / 1440) * 100);
+}
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 5) return 'ຍັງບໍ່ນອນເທື່ອບໍ';
+  if (h < 12) return 'ສະບາຍດີຕອນເຊົ້າ';
+  if (h < 17) return 'ສະບາຍດີຕອນທ່ຽງ';
+  if (h < 21) return 'ສະບາຍດີຕອນແລງ';
+  return 'ໃກ້ຈະນອນແລ້ວ';
+}
+
+function weatherCard() {
+  if (state.weatherStatus === 'loading') {
+    return `
+      <div>
+        <p class="text-xs text-inkfaint uppercase tracking-wide mb-1">ສະພາບອາກາດ</p>
+        <p class="text-inkdim text-sm mt-1">ກຳລັງໂຫລດ...</p>
+      </div>
+      <i data-lucide="loader-circle" class="w-8 h-8 text-inkfaint animate-spin"></i>`;
+  }
+  if (state.weatherStatus === 'error' || !state.weather) {
+    return `
+      <div>
+        <p class="text-xs text-inkfaint uppercase tracking-wide mb-1">ສະພາບອາກາດ</p>
+        <p class="text-inkdim text-sm mt-1">ໂຫລດຂໍ້ມູນບໍ່ໄດ້</p>
+        <button data-action="retry-weather" class="text-xs text-brass mt-1.5">ລອງໃໝ່</button>
+      </div>
+      <i data-lucide="cloud-off" class="w-10 h-10 text-inkfaint"></i>`;
+  }
+  const meta = weatherMeta(state.weather.code);
+  return `
+      <div class="min-w-0">
+        <p class="text-xs text-inkfaint uppercase tracking-wide mb-1 truncate">${escapeHtml(state.weather.place)}</p>
+        <p class="font-display text-3xl font-bold">${state.weather.temp}°</p>
+        <p class="text-inkdim text-sm mt-0.5">${meta.label}</p>
+      </div>
+      <i data-lucide="${meta.icon}" class="w-14 h-14 text-brass/70 shrink-0"></i>`;
+}
+
+function weeklyInsights() {
+  const now = new Date();
+  const dayOfWeek = (now.getDay() + 6) % 7;
+  const startThis = new Date(now); startThis.setDate(now.getDate() - dayOfWeek); startThis.setHours(0, 0, 0, 0);
+  const startLast = new Date(startThis); startLast.setDate(startThis.getDate() - 7);
+  const inRange = (iso, start, end) => { const d = new Date(iso + 'T00:00:00'); return d >= start && d < end; };
+
+  const tasksThis = state.tasks.filter((t) => inRange(t.date, startThis, now));
+  const tasksLast = state.tasks.filter((t) => inRange(t.date, startLast, startThis));
+  const doneThisRate = tasksThis.length ? Math.round((tasksThis.filter((t) => t.done).length / tasksThis.length) * 100) : 0;
+  const doneLastRate = tasksLast.length ? Math.round((tasksLast.filter((t) => t.done).length / tasksLast.length) * 100) : 0;
+  const taskDiff = doneThisRate - doneLastRate;
+
+  const spendThis = state.finance.filter((f) => f.type === 'expense' && inRange(f.date, startThis, now)).reduce((s, f) => s + f.amount, 0);
+  const spendLast = state.finance.filter((f) => f.type === 'expense' && inRange(f.date, startLast, startThis)).reduce((s, f) => s + f.amount, 0);
+  const spendDiff = spendLast > 0 ? Math.round(((spendThis - spendLast) / spendLast) * 100) : (spendThis > 0 ? 100 : 0);
+
+  return `
+  <div class="bg-surface border border-line rounded-2xl p-5 mb-6">
+    <div class="flex items-center gap-2 mb-4">
+      <i data-lucide="trending-up" class="w-4 h-4 text-brass"></i>
+      <h2 class="font-display text-base font-semibold">ພາບລວມສັບປະດານີ້</h2>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <p class="text-inkfaint text-[11px] uppercase tracking-wide mb-1">ອັດຕາເຮັດວຽກສຳເລັດ</p>
+        <p class="font-mono text-xl font-bold">${doneThisRate}%</p>
+        <p class="text-[11px] mt-0.5 ${taskDiff >= 0 ? 'text-teal' : 'text-coral'}">${taskDiff === 0 ? 'ເທົ່າກັບສັບປະດາກ່ອນ' : (taskDiff > 0 ? `ເພີ່ມຂຶ້ນ ${taskDiff}%` : `ຫຼຸດລົງ ${Math.abs(taskDiff)}%`)} ຈາກສັບປະດາກ່ອນ</p>
+      </div>
+      <div>
+        <p class="text-inkfaint text-[11px] uppercase tracking-wide mb-1">ລາຍຈ່າຍສັບປະດານີ້</p>
+        <p class="font-mono text-xl font-bold">${fmtMoney(spendThis)}</p>
+        <p class="text-[11px] mt-0.5 ${spendDiff <= 0 ? 'text-teal' : 'text-coral'}">${spendDiff === 0 ? 'ເທົ່າກັບສັບປະດາກ່ອນ' : (spendDiff > 0 ? `ເພີ່ມຂຶ້ນ ${spendDiff}%` : `ຫຼຸດລົງ ${Math.abs(spendDiff)}%`)} ຈາກສັບປະດາກ່ອນ</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDashboard() {
+  const pct = dayProgressPct();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const dateStr = now.toLocaleDateString('lo-LA', { weekday: 'long', month: 'long', day: 'numeric' });
+  const quoteIdx = Math.floor(now.getTime() / 86400000) % QUOTES.length;
+
+  const pendingToday = state.tasks.filter((t) => !t.done && t.date === todayISO());
+  const doneToday = state.tasks.filter((t) => t.done && t.date === todayISO()).length;
+  const totalToday = state.tasks.filter((t) => t.date === todayISO()).length;
+
+  const balance = state.finance.reduce((s, f) => s + (f.type === 'income' ? f.amount : -f.amount), 0);
+  const habitsToday = state.habits.filter((h) => h.history[todayISO()]).length;
+
+  return `
+  <div class="mb-6">
+    <p class="text-inkdim text-sm">${dateStr}</p>
+    <h1 class="font-display text-3xl font-bold mt-0.5">${greeting()}, ${escapeHtml((state.user.name || '').split(' ')[0])}.</h1>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <!-- Day ring -->
+    <div class="bg-surface border border-line rounded-2xl p-5 flex items-center gap-5">
+      <div class="relative w-24 h-24 shrink-0 rounded-full grid place-items-center ring-track" style="background: conic-gradient(#E8A33D ${pct}%, #2B2F3B ${pct}%)">
+        <div class="absolute inset-[6px] rounded-full bg-surface grid place-items-center">
+          <div class="text-center">
+            <div class="font-mono text-sm font-bold text-ink">${timeStr}</div>
+            <div class="text-[9px] text-inkfaint uppercase tracking-wide mt-0.5">${pct}% ຂອງວັນ</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm text-inkdim leading-snug">ວັນນີ້ຜ່ານໄປແລ້ວ <span class="text-brass font-medium">${pct}%</span> ${totalToday ? `ເຮັດວຽກສຳເລັດ ${doneToday}/${totalToday} ວຽກ` : 'ຍັງບໍ່ມີວຽກທີ່ກຳນົດໄວ້'}</p>
+      </div>
+    </div>
+
+    <!-- Weather -->
+    <div class="bg-surface border border-line rounded-2xl p-5 flex items-center justify-between">
+      ${weatherCard()}
+    </div>
+  </div>
+
+  <!-- Quote -->
+  <div class="bg-gradient-to-br from-surface2 to-surface border border-line rounded-2xl p-5 mb-4 flex gap-3">
+    <i data-lucide="quote" class="w-5 h-5 text-brass shrink-0 mt-0.5"></i>
+    <p class="font-display text-lg leading-snug text-ink/90 font-light italic">${QUOTES[quoteIdx]}</p>
+  </div>
+
+  <!-- Quick stats row -->
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    <div class="bg-surface border border-line rounded-2xl p-4">
+      <i data-lucide="list-todo" class="w-4 h-4 text-brass mb-2"></i>
+      <p class="font-mono text-xl font-bold">${pendingToday.length}</p>
+      <p class="text-inkfaint text-[11px] mt-0.5">ລໍດຳເນີນການວັນນີ້</p>
+    </div>
+    <div class="bg-surface border border-line rounded-2xl p-4">
+      <i data-lucide="flame" class="w-4 h-4 text-coral mb-2"></i>
+      <p class="font-mono text-xl font-bold">${habitsToday}/${state.habits.length}</p>
+      <p class="text-inkfaint text-[11px] mt-0.5">ນິໄສທີ່ເຮັດແລ້ວ</p>
+    </div>
+    <div class="bg-surface border border-line rounded-2xl p-4 min-w-0">
+      <i data-lucide="banknote" class="w-4 h-4 text-teal mb-2"></i>
+      <p class="font-mono text-base sm:text-xl font-bold truncate ${balance < 0 ? 'text-coral' : 'text-ink'}">${fmtMoney(balance)}</p>
+      <p class="text-inkfaint text-[11px] mt-0.5">ຍອດຄົງເຫຼືອ</p>
+    </div>
+  </div>
+
+  <!-- Monthly calendar -->
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="font-display text-lg font-semibold">ປະຕິທິນລາຍເດືອນ</h2>
+    <button data-action="toggle-month-calendar" class="text-xs text-brass flex items-center gap-1">${state.showMonthCalendar ? 'ເຊື່ອງ' : 'ສະແດງ'} <i data-lucide="${state.showMonthCalendar ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5"></i></button>
+  </div>
+  ${state.showMonthCalendar ? monthCalendar() : ''}
+
+  ${weeklyInsights()}
+
+  <!-- Today's tasks -->
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="font-display text-lg font-semibold">ວຽກວັນນີ້</h2>
+    <button data-action="set-view" data-view="tasks" class="text-xs text-brass flex items-center gap-1">ເບິ່ງທັງໝົດ <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+  </div>
+  <div class="space-y-2">
+    ${pendingToday.length === 0 ? emptyState('circle-check', 'ບໍ່ມີວຽກຄ້າງວັນນີ້', 'ເພີ່ມວຽກເພື່ອເລີ່ມລົງມືເຮັດ') :
+      pendingToday.slice(0, 4).map(taskRow).join('')}
+  </div>
+  `;
+}
+
+function monthCalendar() {
+  const offset = state.calendarMonthOffset || 0;
+  const base = new Date();
+  base.setDate(1);
+  base.setMonth(base.getMonth() + offset);
+  const year = base.getFullYear(), month = base.getMonth();
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthLabel = base.toLocaleDateString('lo-LA', { month: 'long', year: 'numeric' });
+  const todayStr = todayISO();
+
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const iso = (d) => `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+  return `
+  <div class="bg-surface border border-line rounded-2xl p-4 mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <button data-action="month-prev" class="w-7 h-7 rounded-full border border-line grid place-items-center text-inkdim hover:text-ink transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+      <span class="text-sm font-medium text-ink">${monthLabel}</span>
+      <button data-action="month-next" class="w-7 h-7 rounded-full border border-line grid place-items-center text-inkdim hover:text-ink transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+    </div>
+    <div class="grid grid-cols-7 gap-1 mb-1">
+      ${['ອາ', 'ຈ', 'ອ', 'ພ', 'ພຫ', 'ສຸ', 'ສ'].map((d) => `<div class="text-center text-[10px] text-inkfaint py-1">${d}</div>`).join('')}
+    </div>
+    <div class="grid grid-cols-7 gap-1">
+      ${cells.map((d) => {
+        if (!d) return `<div></div>`;
+        const dateStr = iso(d);
+        const isToday = dateStr === todayStr;
+        const taskCount = state.tasks.filter((t) => t.date === dateStr).length;
+        const finCount = state.finance.filter((f) => f.date === dateStr).length;
+        return `
+        <button data-action="filter-date-goto" data-date="${dateStr}" class="aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 text-xs transition-colors ${isToday ? 'bg-brass text-bg font-semibold' : 'hover:bg-surface2 text-ink'}">
+          <span>${d}</span>
+          <span class="flex gap-0.5">
+            ${taskCount ? `<span class="w-1 h-1 rounded-full ${isToday ? 'bg-bg' : 'bg-brass'}"></span>` : ''}
+            ${finCount ? `<span class="w-1 h-1 rounded-full ${isToday ? 'bg-bg' : 'bg-teal'}"></span>` : ''}
+          </span>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="flex items-center gap-4 mt-3 text-[10px] text-inkfaint">
+      <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-brass"></span> ມີວຽກ</span>
+      <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-teal"></span> ມີທຸລະກຳ</span>
+    </div>
+  </div>`;
+}
+
+function emptyState(icon, title, sub) {
+  return `
+  <div class="border border-dashed border-line rounded-2xl py-10 flex flex-col items-center text-center px-6">
+    <i data-lucide="${icon}" class="w-7 h-7 text-inkfaint mb-3"></i>
+    <p class="text-sm text-ink/80">${title}</p>
+    <p class="text-xs text-inkfaint mt-1">${sub}</p>
+  </div>`;
+}
+
+function catColor(id) { return (TASK_CATS.find((c) => c.id === id) || {}).color || 'inkdim'; }
+function prioColor(id) { return (PRIORITIES.find((p) => p.id === id) || {}).color || 'inkdim'; }
+
+function taskRow(t) {
+  const subtasks = t.subtasks || [];
+  const subDone = subtasks.filter((s) => s.done).length;
+  const expanded = state.expandedTasks && state.expandedTasks[t.id];
+  return `
+  <div class="bg-surface border border-line rounded-xl overflow-hidden" data-task-id="${t.id}">
+    <div class="flex items-center gap-2 px-4 py-3">
+      <span class="task-drag-handle cursor-grab active:cursor-grabbing text-inkfaint shrink-0 touch-none" title="ລາກເພື່ອຈັດລຳດັບ">
+        <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+      </span>
+      <button data-action="toggle-task" data-id="${t.id}" class="w-5 h-5 rounded-full border-2 shrink-0 grid place-items-center transition-colors ${t.done ? 'bg-teal border-teal' : 'border-inkfaint'}">
+        ${t.done ? '<i data-lucide="check" class="w-3 h-3 text-bg"></i>' : ''}
+      </button>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm truncate ${t.done ? 'line-through text-inkfaint' : 'text-ink'}">${escapeHtml(t.title)}</p>
+        <div class="flex items-center gap-2 mt-1">
+          <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-${catColor(t.category)}/15 text-${catColor(t.category)}">${t.category}</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-${prioColor(t.priority)}/15 text-${prioColor(t.priority)}">${t.priority}</span>
+          ${t.repeat && t.repeat !== 'none' ? `<i data-lucide="repeat" class="w-3 h-3 text-inkfaint" title="ເຮັດຊ້ຳ"></i>` : ''}
+          ${subtasks.length ? `<span class="text-[10px] text-inkfaint font-mono">${subDone}/${subtasks.length}</span>` : ''}
+        </div>
+      </div>
+      <button data-action="toggle-subtasks" data-id="${t.id}" class="text-inkfaint hover:text-ink p-1.5 shrink-0">
+        <i data-lucide="${expanded ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>
+      </button>
+      <button data-action="delete-task" data-id="${t.id}" class="text-inkfaint hover:text-coral p-1.5 shrink-0">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+      </button>
+    </div>
+    ${expanded ? `
+    <div class="px-4 pb-3 pl-[3.25rem] space-y-1.5">
+      ${subtasks.map((s) => `
+        <div class="flex items-center gap-2">
+          <button data-action="toggle-subtask" data-id="${t.id}" data-sub="${s.id}" class="w-4 h-4 rounded border shrink-0 grid place-items-center ${s.done ? 'bg-teal border-teal' : 'border-inkfaint'}">
+            ${s.done ? '<i data-lucide="check" class="w-2.5 h-2.5 text-bg"></i>' : ''}
+          </button>
+          <span class="text-xs flex-1 ${s.done ? 'line-through text-inkfaint' : 'text-inkdim'}">${escapeHtml(s.title)}</span>
+          <button data-action="delete-subtask" data-id="${t.id}" data-sub="${s.id}" class="text-inkfaint hover:text-coral"><i data-lucide="x" class="w-3 h-3"></i></button>
+        </div>`).join('')}
+      <form data-action="add-subtask-form" data-id="${t.id}" class="flex items-center gap-2 mt-2">
+        <input name="subtitle" placeholder="ເພີ່ມວຽກຍ່ອຍ..." class="flex-1 bg-surface2 border border-line rounded-lg px-2.5 py-1.5 text-xs placeholder:text-inkfaint focus:border-brass" />
+        <button type="submit" class="text-xs text-brass shrink-0">ເພີ່ມ</button>
+      </form>
+    </div>` : ''}
+  </div>`;
+}
+
+/* ---------------- TASKS ---------------- */
+
+function weekDates() {
+  const now = new Date();
+  const day = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((day + 6) % 7) + (state.weekOffset || 0) * 7);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return toLocalISODate(d);
+  });
+}
+
+function weekRangeLabel(week) {
+  const start = new Date(week[0] + 'T00:00:00');
+  const end = new Date(week[6] + 'T00:00:00');
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+  const endStr = end.toLocaleDateString('lo-LA', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (sameMonth) return `${start.getDate()} - ${endStr}`;
+  const startStr = start.toLocaleDateString('lo-LA', { day: 'numeric', month: 'short' });
+  return `${startStr} - ${endStr}`;
+}
+
+function renderTasks() {
+  const week = weekDates();
+  const filtered = state.tasks.filter((t) => {
+    if (state.taskFilter !== 'ທັງໝົດ' && t.category !== state.taskFilter) return false;
+    if (state.taskDateFilter && t.date !== state.taskDateFilter) return false;
+    return true;
+  }).sort((a, b) => (a.done - b.done) || ((a.order || 0) - (b.order || 0)) || a.date.localeCompare(b.date));
+  const draggable = state.taskFilter === 'ທັງໝົດ' && !state.taskDateFilter;
+
+  return `
+  <div class="flex items-center justify-between mb-1">
+    <h1 class="font-display text-2xl font-bold">ວຽກ</h1>
+    <button data-action="quick-add" data-type="task" class="bg-brass text-bg text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+      <i data-lucide="plus" class="w-4 h-4"></i> ໃໝ່
+    </button>
+  </div>
+
+  ${pomodoroWidget()}
+
+  <div class="flex items-center gap-2 mb-5">
+    <button data-action="week-prev" class="w-7 h-7 rounded-full border border-line grid place-items-center text-inkdim hover:text-ink transition-colors shrink-0">
+      <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+    </button>
+    <span class="text-sm text-inkdim font-medium">${weekRangeLabel(week)}</span>
+    <button data-action="week-next" class="w-7 h-7 rounded-full border border-line grid place-items-center text-inkdim hover:text-ink transition-colors shrink-0">
+      <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+    </button>
+    ${state.weekOffset !== 0 ? `<button data-action="week-today" class="text-xs text-brass ml-1">ວັນນີ້</button>` : ''}
+  </div>
+
+  <!-- weekly calendar strip -->
+  <div class="grid grid-cols-7 gap-1.5 mb-5">
+    ${week.map((d) => {
+      const dObj = new Date(d + 'T00:00:00');
+      const count = state.tasks.filter((t) => t.date === d && !t.done).length;
+      const isToday = d === todayISO();
+      const active = state.taskDateFilter === d;
+      return `
+      <button data-action="filter-date" data-date="${d}" class="flex flex-col items-center gap-1.5 py-2.5 rounded-xl border transition-colors ${active ? 'bg-brass border-brass text-bg font-medium' : isToday ? 'border-brass/50 text-ink' : 'border-line text-inkdim'}">
+        <span class="text-[10px] uppercase">${dObj.toLocaleDateString('lo-LA', { weekday: 'short' }).slice(0, 2)}</span>
+        <span class="text-sm font-mono">${dObj.getDate()}</span>
+        <span class="w-1.5 h-1.5 rounded-full ${count > 0 ? (active ? 'bg-bg' : 'bg-brass') : 'bg-transparent'}"></span>
+      </button>`;
+    }).join('')}
+  </div>
+  ${state.taskDateFilter ? `<button data-action="filter-date" data-date="${state.taskDateFilter}" class="text-xs text-inkdim mb-4 flex items-center gap-1"><i data-lucide="x" class="w-3 h-3"></i> ລ້າງຕົວກອງວັນທີ (${fmtDateShort(state.taskDateFilter)})</button>` : ''}
+
+  <!-- category filter -->
+  <div class="flex gap-2 mb-4 overflow-x-auto nested-scroll pb-1">
+    ${['ທັງໝົດ', ...TASK_CATS.map((c) => c.id)].map((c) => `
+      <button data-action="filter-cat" data-cat="${c}" class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${state.taskFilter === c ? 'bg-ink text-bg border-ink' : 'border-line text-inkdim'}">${c}</button>
+    `).join('')}
+  </div>
+
+  ${draggable && filtered.length > 1 ? `<p class="text-inkfaint text-[11px] mb-2 flex items-center gap-1"><i data-lucide="move" class="w-3 h-3"></i> ລາກທີ່ໄອຄອນ ⠿ ເພື່ອຈັດລຳດັບວຽກ</p>` : ''}
+  <div id="task-list" class="space-y-2">
+    ${filtered.length === 0 ? emptyState('list-todo', 'ບໍ່ມີວຽກທີ່ກ່ຽວຂ້ອງກັບມຸມມອງນີ້', 'ລອງປ່ຽນຕົວກອງ ຫຼື ເພີ່ມວຽກໃໝ່') : filtered.map(taskRow).join('')}
+  </div>
+  `;
+}
+
+/* ---------------- POMODORO TIMER ---------------- */
+
+const pomodoro = {
+  seconds: 25 * 60,
+  totalSeconds: 25 * 60,
+  mode: 'work',
+  running: false,
+  intervalId: null,
+};
+
+function pomodoroWidget() {
+  const mins = Math.floor(pomodoro.seconds / 60).toString().padStart(2, '0');
+  const secs = (pomodoro.seconds % 60).toString().padStart(2, '0');
+  const pct = Math.round((1 - pomodoro.seconds / pomodoro.totalSeconds) * 100);
+  return `
+  <div class="bg-surface border border-line rounded-2xl p-4 mb-5 flex items-center gap-4">
+    <div class="relative w-14 h-14 shrink-0 grid place-items-center rounded-full" style="background: conic-gradient(${pomodoro.mode === 'work' ? '#E8A33D' : '#4FBF9F'} ${pct * 3.6}deg, #232733 ${pct * 3.6}deg)">
+      <div class="absolute inset-[3px] rounded-full bg-surface grid place-items-center">
+        <i data-lucide="${pomodoro.mode === 'work' ? 'brain' : 'coffee'}" class="w-5 h-5 ${pomodoro.mode === 'work' ? 'text-brass' : 'text-teal'}"></i>
+      </div>
+    </div>
+    <div class="flex-1">
+      <p class="font-mono text-2xl font-bold text-ink">${mins}:${secs}</p>
+      <p class="text-[11px] text-inkfaint">${pomodoro.mode === 'work' ? 'ໂຟກັດເຮັດວຽກ' : 'ພັກສະໝອງ'} ${pomodoro.running ? '· ກຳລັງເຮັດວຽກ' : ''}</p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button data-action="pomodoro-toggle" class="w-10 h-10 rounded-full bg-brass text-bg grid place-items-center active:scale-90 transition-transform">
+        <i data-lucide="${pomodoro.running ? 'pause' : 'play'}" class="w-4 h-4"></i>
+      </button>
+      <button data-action="pomodoro-reset" class="w-10 h-10 rounded-full bg-surface2 border border-line text-inkdim grid place-items-center active:scale-90 transition-transform">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>`;
+}
+
+function updatePomodoroDom() {
+  const mins = Math.floor(pomodoro.seconds / 60).toString().padStart(2, '0');
+  const secs = (pomodoro.seconds % 60).toString().padStart(2, '0');
+  const pct = Math.round((1 - pomodoro.seconds / pomodoro.totalSeconds) * 100);
+  const timeEl = document.querySelector('#view-root .font-mono.text-2xl');
+  const ring = document.querySelector('#view-root .relative.w-14.h-14');
+  if (timeEl) timeEl.textContent = `${mins}:${secs}`;
+  if (ring) ring.style.background = `conic-gradient(${pomodoro.mode === 'work' ? '#E8A33D' : '#4FBF9F'} ${pct * 3.6}deg, #232733 ${pct * 3.6}deg)`;
+}
+
+function pomodoroTick() {
+  pomodoro.seconds--;
+  if (pomodoro.seconds <= 0) {
+    const wasWork = pomodoro.mode === 'work';
+    pomodoro.mode = wasWork ? 'break' : 'work';
+    pomodoro.totalSeconds = pomodoro.mode === 'work' ? 25 * 60 : 5 * 60;
+    pomodoro.seconds = pomodoro.totalSeconds;
+    toast(wasWork ? 'ໝົດເວລາໂຟກັດ ພັກຜ່ອນໜ້ອຍ ☕' : 'ພັກສຳເລັດ ກັບມາໂຟກັດຕໍ່ 🧠');
+    if (state.view === 'tasks') render();
+    return;
+  }
+  if (state.view === 'tasks') updatePomodoroDom();
+}
+
+function pomodoroToggle() {
+  pomodoro.running = !pomodoro.running;
+  if (pomodoro.running) {
+    pomodoro.intervalId = setInterval(pomodoroTick, 1000);
+  } else {
+    clearInterval(pomodoro.intervalId);
+  }
+  render();
+}
+
+function pomodoroReset() {
+  clearInterval(pomodoro.intervalId);
+  pomodoro.running = false;
+  pomodoro.mode = 'work';
+  pomodoro.totalSeconds = 25 * 60;
+  pomodoro.seconds = 25 * 60;
+  render();
+}
+
+function wireTaskDragDrop() {
+  const list = document.getElementById('task-list');
+  if (!list || !window.Sortable) return;
+  if (list._sortable) { list._sortable.destroy(); }
+  list._sortable = new Sortable(list, {
+    handle: '.task-drag-handle',
+    animation: 150,
+    onEnd: () => {
+      const ids = [...list.querySelectorAll('[data-task-id]')].map((el) => el.dataset.taskId);
+      ids.forEach((id, i) => {
+        const t = state.tasks.find((x) => x.id === id);
+        if (t) t.order = i;
+      });
+      saveAll();
+    },
+  });
+}
+
+/* ---------------- FINANCE ---------------- */
+
+function budgetCard(monthExpense) {
+  const limit = state.budget.monthly || 0;
+  if (!limit) {
+    return `<p class="text-inkdim text-sm">ຍັງບໍ່ໄດ້ຕັ້ງງົບປະມານ — ກົດແກ້ໄຂເພື່ອກຳນົດວົງເງິນລາຍເດືອນ</p>`;
+  }
+  const pct = Math.min(100, Math.round((monthExpense / limit) * 100));
+  const over = monthExpense > limit;
+  const barColor = over ? 'bg-coral' : pct >= 80 ? 'bg-brass' : 'bg-teal';
+  return `
+    <div class="flex items-end justify-between mb-2">
+      <span class="font-mono text-lg font-bold ${over ? 'text-coral' : ''}">${fmtMoney(monthExpense)}</span>
+      <span class="text-inkfaint text-xs">ຈາກ ${fmtMoney(limit)}</span>
+    </div>
+    <div class="h-2.5 bg-surface2 rounded-full overflow-hidden">
+      <div class="h-full ${barColor} transition-all" style="width:${pct}%"></div>
+    </div>
+    <p class="text-xs mt-1.5 ${over ? 'text-coral' : 'text-inkfaint'}">
+      ${over ? `ເກີນງົບປະມານໄປແລ້ວ ${fmtMoney(monthExpense - limit)}` : `ໃຊ້ໄປແລ້ວ ${pct}% ຂອງງົບເດືອນນີ້`}
+    </p>`;
+}
+
+function renderFinance() {
+  const income = state.finance.filter((f) => f.type === 'income').reduce((s, f) => s + f.amount, 0);
+  const expense = state.finance.filter((f) => f.type === 'expense').reduce((s, f) => s + f.amount, 0);
+  const balance = income - expense;
+  const goalPct = Math.min(100, Math.round((state.goal.saved / Math.max(1, state.goal.target)) * 100));
+  const curMonth = todayISO().slice(0, 7);
+  const monthExpense = state.finance.filter((f) => f.type === 'expense' && f.date.slice(0, 7) === curMonth).reduce((s, f) => s + f.amount, 0);
+
+  const sorted = [...state.finance].sort((a, b) => b.date.localeCompare(a.date));
+  const grouped = {};
+  sorted.forEach((f) => { (grouped[f.date] = grouped[f.date] || []).push(f); });
+
+  return `
+  <div class="flex items-center justify-between mb-5">
+    <h1 class="font-display text-2xl font-bold">ການເງິນ</h1>
+    <div class="flex items-center gap-2">
+      <button data-action="export-finance-csv" class="border border-line text-inkdim hover:text-ink text-sm font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+        <i data-lucide="file-down" class="w-4 h-4"></i> CSV
+      </button>
+      <button data-action="quick-add" data-type="finance" class="bg-brass text-bg text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+        <i data-lucide="plus" class="w-4 h-4"></i> ໃໝ່
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-surface border border-line rounded-2xl p-5 mb-4 min-w-0">
+    <p class="text-xs text-inkfaint uppercase tracking-wide mb-1">ຍອດຄົງເຫຼືອ</p>
+    <p class="font-mono text-2xl sm:text-3xl font-bold truncate ${balance < 0 ? 'text-coral' : 'text-ink'}">${fmtMoney(balance)}</p>
+    <div class="flex gap-4 mt-4">
+      <div class="flex items-center gap-2 text-sm">
+        <span class="w-2 h-2 rounded-full bg-teal"></span> <span class="text-inkdim">ລາຍຮັບ</span> <span class="font-mono font-medium">${fmtMoney(income)}</span>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <span class="w-2 h-2 rounded-full bg-coral"></span> <span class="text-inkdim">ລາຍຈ່າຍ</span> <span class="font-mono font-medium">${fmtMoney(expense)}</span>
+      </div>
+    </div>
+  </div>
+
+  ${state.finance.length > 0 ? `
+  <div class="grid sm:grid-cols-2 gap-4 mb-4">
+    <div class="bg-surface border border-line rounded-2xl p-5">
+      <p class="text-sm text-ink/90 font-medium mb-3">ລາຍຈ່າຍຕາມໝວດໝູ່</p>
+      <div class="relative h-48"><canvas id="chart-expense-pie"></canvas></div>
+    </div>
+    <div class="bg-surface border border-line rounded-2xl p-5">
+      <p class="text-sm text-ink/90 font-medium mb-3">ລາຍຮັບ-ລາຍຈ່າຍ 6 ເດືອນ</p>
+      <div class="relative h-48"><canvas id="chart-income-expense-bar"></canvas></div>
+    </div>
+  </div>` : ''}
+
+  <div class="bg-surface border border-line rounded-2xl p-5 mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm text-ink/90 font-medium">ງົບປະມານລາຍເດືອນ</p>
+      <button data-action="edit-budget" class="text-xs text-brass">ແກ้ໄຂ</button>
+    </div>
+    ${budgetCard(monthExpense)}
+  </div>
+
+  <div class="bg-surface border border-line rounded-2xl p-5 mb-6">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm text-ink/90 font-medium">ເປົ້າໝາຍການອອມ</p>
+      <button data-action="edit-goal" class="text-xs text-brass">ແກ້ໄຂ</button>
+    </div>
+    <div class="flex items-end justify-between mb-2">
+      <span class="font-mono text-lg font-bold">${fmtMoney(state.goal.saved)}</span>
+      <span class="text-inkfaint text-xs">ຈາກ ${fmtMoney(state.goal.target)}</span>
+    </div>
+    <div class="h-2.5 bg-surface2 rounded-full overflow-hidden">
+      <div class="h-full bg-gradient-to-r from-brass to-teal transition-all" style="width:${goalPct}%"></div>
+    </div>
+    <p class="text-inkfaint text-[11px] mt-1.5">ສຳເລັດແລ້ວ ${goalPct}%</p>
+  </div>
+
+  <h2 class="font-display text-lg mb-3 font-semibold">ລາຍການທຸລະກຳ</h2>
+  ${sorted.length === 0 ? emptyState('wallet', 'ຍັງບໍ່ມີທຸລະກຳ', 'ບັນທຶກລາຍຮັບ ຫຼື ລາຍຈ່າຍທຳອິດຂອງທ່ານ') : Object.keys(grouped).map((date) => `
+    <p class="text-inkfaint text-[11px] uppercase tracking-wide mb-2 mt-4 first:mt-0 font-medium">${fmtDateShort(date)}</p>
+    <div class="space-y-2">
+      ${grouped[date].map(financeRow).join('')}
+    </div>
+  `).join('')}
+  `;
+}
+
+let _financeCharts = [];
+function destroyFinanceCharts() {
+  _financeCharts.forEach((c) => { try { c.destroy(); } catch (e) {} });
+  _financeCharts = [];
+}
+
+function drawFinanceCharts() {
+  destroyFinanceCharts();
+  if (!window.Chart || state.finance.length === 0) return;
+
+  const pieCanvas = document.getElementById('chart-expense-pie');
+  if (pieCanvas) {
+    const byCategory = {};
+    state.finance.filter((f) => f.type === 'expense').forEach((f) => { byCategory[f.category] = (byCategory[f.category] || 0) + f.amount; });
+    const labels = Object.keys(byCategory);
+    const palette = ['#E8A33D', '#4FBF9F', '#E8615F', '#9086E8', '#8A6A34', '#5D6274'];
+    _financeCharts.push(new Chart(pieCanvas, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data: Object.values(byCategory), backgroundColor: labels.map((_, i) => palette[i % palette.length]), borderWidth: 0 }] },
+      options: { plugins: { legend: { position: 'bottom', labels: { color: '#9398A8', boxWidth: 10, font: { family: 'Phetsarath OT, Outfit', size: 10 } } } }, maintainAspectRatio: false }
+    }));
+  }
+
+  const barCanvas = document.getElementById('chart-income-expense-bar');
+  if (barCanvas) {
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(); d.setMonth(d.getMonth() - (5 - i));
+      return toLocalISODate(d).slice(0, 7);
+    });
+    const monthLabel = (m) => new Date(m + '-01T00:00:00').toLocaleDateString('lo-LA', { month: 'short' });
+    const incomeData = months.map((m) => state.finance.filter((f) => f.type === 'income' && f.date.slice(0, 7) === m).reduce((s, f) => s + f.amount, 0));
+    const expenseData = months.map((m) => state.finance.filter((f) => f.type === 'expense' && f.date.slice(0, 7) === m).reduce((s, f) => s + f.amount, 0));
+    _financeCharts.push(new Chart(barCanvas, {
+      type: 'bar',
+      data: {
+        labels: months.map(monthLabel),
+        datasets: [
+          { label: 'ລາຍຮັບ', data: incomeData, backgroundColor: '#4FBF9F', borderRadius: 4 },
+          { label: 'ລາຍຈ່າຍ', data: expenseData, backgroundColor: '#E8615F', borderRadius: 4 },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#9398A8', boxWidth: 10, font: { family: 'Phetsarath OT, Outfit', size: 10 } } } },
+        scales: {
+          x: { ticks: { color: '#9398A8', font: { family: 'Outfit, Phetsarath OT', size: 10 } }, grid: { display: false } },
+          y: { ticks: { color: '#9398A8', font: { family: 'Outfit', size: 10 } }, grid: { color: '#2B2F3B' } }
+        }
+      }
+    }));
+  }
+}
+
+function exportFinanceCSV() {
+  const rows = [['ວັນທີ', 'ປະເພດ', 'ໝວດໝູ່', 'ບັນທຶກ', 'ຈຳນວນເງິນ']];
+  [...state.finance].sort((a, b) => a.date.localeCompare(b.date)).forEach((f) => {
+    rows.push([f.date, f.type === 'income' ? 'ລາຍຮັບ' : 'ລາຍຈ່າຍ', f.category, (f.note || '').replace(/"/g, '""'), f.amount]);
+  });
+  const csv = '\uFEFF' + rows.map((r) => r.map((c) => `"${c}"`).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dayframe-finance-${todayISO()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('ດາວໂຫຼດໄຟລ໌ CSV ແລ້ວ');
+}
+
+function financeRow(f) {
+  const isIncome = f.type === 'income';
+  return `
+  <div class="flex items-center gap-3 bg-surface border border-line rounded-xl px-4 py-3">
+    <div class="w-9 h-9 rounded-full grid place-items-center shrink-0 ${isIncome ? 'bg-teal/15' : 'bg-coral/15'}">
+      <i data-lucide="${isIncome ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4 ${isIncome ? 'text-teal' : 'text-coral'}"></i>
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="text-sm text-ink truncate font-medium">${escapeHtml(f.note || f.category)}</p>
+      <p class="text-[11px] text-inkfaint mt-0.5">${f.category}</p>
+    </div>
+    <span class="font-mono text-sm font-semibold ${isIncome ? 'text-teal' : 'text-coral'}">${isIncome ? '+' : '-'}${fmtMoney(f.amount)}</span>
+    <button data-action="delete-finance" data-id="${f.id}" class="text-inkfaint hover:text-coral p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+  </div>`;
+}
+
+/* ---------------- NOTES ---------------- */
+
+function allTags() {
+  const s = new Set();
+  state.notes.forEach((n) => (n.tags || []).forEach((t) => s.add(t)));
+  return [...s];
+}
+
+function renderNotes() {
+  const q = state.noteSearch.toLowerCase();
+  const filtered = state.notes.filter((n) => {
+    const matchesQ = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
+    const matchesTag = !state.noteTagFilter || (n.tags || []).includes(state.noteTagFilter);
+    return matchesQ && matchesTag;
+  }).sort((a, b) => b.date.localeCompare(a.date));
+
+  const tags = allTags();
+
+  return `
+  <div class="flex items-center justify-between mb-5">
+    <h1 class="font-display text-2xl font-bold">ບັນທຶກ</h1>
+    <button data-action="quick-add" data-type="note" class="bg-brass text-bg text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+      <i data-lucide="plus" class="w-4 h-4"></i> ໃໝ່
+    </button>
+  </div>
+
+  <div class="relative mb-3">
+    <i data-lucide="search" class="w-4 h-4 text-inkfaint absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+    <input id="note-search-input" value="${escapeHtml(state.noteSearch)}" placeholder="ຄົ້ນຫາບັນທຶກ..." class="w-full bg-surface border border-line rounded-xl pl-10 pr-4 py-2.5 text-sm placeholder:text-inkfaint focus:border-brass" />
+  </div>
+
+  ${tags.length ? `<div class="flex gap-2 mb-4 overflow-x-auto nested-scroll pb-1">
+    <button data-action="filter-tag" data-tag="" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${!state.noteTagFilter ? 'bg-ink text-bg border-ink' : 'border-line text-inkdim'}">ທັງໝົດ</button>
+    ${tags.map((t) => `<button data-action="filter-tag" data-tag="${escapeHtml(t)}" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${state.noteTagFilter === t ? 'bg-ink text-bg border-ink' : 'border-line text-inkdim'}">#${escapeHtml(t)}</button>`).join('')}
+  </div>` : ''}
+
+  <div class="grid sm:grid-cols-2 gap-3">
+    ${filtered.length === 0 ? `<div class="sm:col-span-2">${emptyState('notebook-pen', 'ບໍ່ພົບບັນທຶກ', 'ຈົດໄອເດຍໄວ້ກ່ອນທີ່ຈະລືມ')}</div>` : filtered.map(noteCard).join('')}
+  </div>
+  `;
+}
+
+function mdLite(s) {
+  return escapeHtml(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+
+function noteCard(n) {
+  return `
+  <div data-action="edit-note" data-id="${n.id}" class="bg-surface border border-line rounded-2xl p-4 cursor-pointer hover:border-brass/40 transition-colors">
+    <div class="flex items-start justify-between gap-2">
+      <p class="text-sm font-medium text-ink line-clamp-1">${escapeHtml(n.title || 'ບໍ່ມີຊື່')}</p>
+      <button data-action="delete-note" data-id="${n.id}" class="text-inkfaint hover:text-coral shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    </div>
+    <p class="text-xs text-inkdim mt-1.5 line-clamp-3 leading-relaxed">${mdLite(n.content)}</p>
+    <div class="flex items-center justify-between mt-3">
+      <div class="flex gap-1.5 flex-wrap">
+        ${(n.tags || []).slice(0, 3).map((t) => `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-violet/15 text-violet">#${escapeHtml(t)}</span>`).join('')}
+      </div>
+      <span class="text-[10px] text-inkfaint shrink-0">${fmtDateShort(n.date)}</span>
+    </div>
+  </div>`;
+}
+
+/* ---------------- HABITS ---------------- */
+
+function last7Days() {
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return toLocalISODate(d);
+  });
+}
+
+function computeStreak(h) {
+  let streak = 0;
+  let d = new Date();
+  if (!h.history[todayISO()]) d.setDate(d.getDate() - 1);
+  while (h.history[toLocalISODate(d)]) {
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+function last365Days() {
+  return Array.from({ length: 365 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (364 - i));
+    return toLocalISODate(d);
+  });
+}
+
+function habitHeatmap(h) {
+  const days = last365Days();
+  const firstDow = new Date(days[0] + 'T00:00:00').getDay();
+  const padded = Array(firstDow).fill(null).concat(days);
+  const weeks = [];
+  for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7));
+
+  const levelClass = (d) => {
+    if (!d) return 'bg-transparent';
+    if (!h.history[d]) return 'bg-surface2';
+    return 'bg-brass';
+  };
+
+  return `
+  <div class="overflow-x-auto nested-scroll pb-1">
+    <div class="flex gap-[3px]" style="min-width:${weeks.length * 13}px">
+      ${weeks.map((week) => `
+        <div class="flex flex-col gap-[3px]">
+          ${week.map((d) => `<div title="${d || ''}" ${d ? `data-action="toggle-habit-day" data-id="${h.id}" data-date="${d}"` : ''} class="w-[10px] h-[10px] rounded-[2px] ${levelClass(d)} ${d ? 'cursor-pointer hover:ring-1 hover:ring-brass/60' : ''}"></div>`).join('')}
+        </div>
+      `).join('')}
+    </div>
+  </div>
+  <p class="text-inkfaint text-[10px] mt-1.5">365 ວັນທີ່ຜ່ານມາ</p>
+  `;
+}
+
+function renderHabits() {
+  const days = last7Days();
+  const showHeatmap = !!state.habitHeatmap;
+  return `
+  <div class="flex items-center justify-between mb-5">
+    <h1 class="font-display text-2xl font-bold">ນິໄສ</h1>
+    <div class="flex items-center gap-2">
+      <button data-action="toggle-habit-heatmap" class="border border-line text-inkdim hover:text-ink text-sm font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+        <i data-lucide="${showHeatmap ? 'calendar-days' : 'grid-3x3'}" class="w-4 h-4"></i> ${showHeatmap ? '7 ວັນ' : 'Heatmap'}
+      </button>
+      <button data-action="add-habit" class="bg-brass text-bg text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+        <i data-lucide="plus" class="w-4 h-4"></i> ໃໝ່
+      </button>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    ${state.habits.length === 0 ? emptyState('flame', 'ຍັງບໍ່ມີນິໄສ', 'ເພີ່ມນິໄສເພື່ອເລີ່ມສ້າງສະຖິຕິຕໍ່ເນື່ອງ') : state.habits.map((h) => {
+      const streak = computeStreak(h);
+      const doneToday = !!h.history[todayISO()];
+      return `
+      <div class="bg-surface border border-line rounded-2xl p-4">
+        <div class="flex items-center gap-3">
+          <button data-action="toggle-habit" data-id="${h.id}" class="w-11 h-11 rounded-full grid place-items-center shrink-0 transition-colors ${doneToday ? 'bg-brass text-bg' : 'bg-surface2 text-inkdim border border-line'}">
+            <i data-lucide="${h.icon}" class="w-5 h-5"></i>
+          </button>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-ink">${escapeHtml(h.name)}</p>
+            <div class="flex items-center gap-1 mt-0.5">
+              <i data-lucide="flame" class="w-3 h-3 text-coral"></i>
+              <span class="text-xs text-inkdim font-mono">ຕໍ່ເນື່ອງ ${streak} ວັນ</span>
+            </div>
+          </div>
+          <button data-action="delete-habit" data-id="${h.id}" class="text-inkfaint hover:text-coral p-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+        ${showHeatmap ? `<div class="mt-3.5 pl-14">${habitHeatmap(h)}</div>` : `
+        <div class="flex gap-1.5 mt-3.5 pl-14">
+          ${days.map((d) => {
+            const on = !!h.history[d];
+            const isToday = d === todayISO();
+            return `<button data-action="toggle-habit-day" data-id="${h.id}" data-date="${d}" class="streak-dot flex-1 h-6 rounded-md ${on ? 'bg-brass' : 'bg-surface2'} ${isToday ? 'ring-1 ring-brass/50' : ''}"></button>`;
+          }).join('')}
+        </div>`}
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+}
+
+/* ---------------- SETTINGS ---------------- */
+
+function notifStatusLabel() {
+  if (state.notifStatus === 'unsupported') return 'ບໍ່ຮອງຮັບ';
+  if (state.notifStatus === 'granted') return 'ເປີດຢູ່';
+  if (state.notifStatus === 'denied') return 'ຖືກປິດ';
+  return 'ປິດຢູ່ · ແຕະເພື່ອເປີດ';
+}
+
+function avatarHtml(user, sizeClass) {
+  const size = sizeClass || 'w-12 h-12 text-lg';
+  if (user.avatar && user.avatar.startsWith('data:image')) {
+    return `<img src="${user.avatar}" class="${size} rounded-full object-cover shrink-0" alt="avatar" />`;
+  }
+  if (user.avatar && user.avatar.startsWith('emoji:')) {
+    return `<div class="${size} rounded-full bg-brass/15 grid place-items-center shrink-0 font-display">${user.avatar.slice(6)}</div>`;
+  }
+  return `<div class="${size} rounded-full bg-brass/15 text-brass grid place-items-center font-display shrink-0 font-bold">${escapeHtml((user.name || '?')[0].toUpperCase())}</div>`;
+}
+
+function renderSettings() {
+  return `
+  <h1 class="font-display text-2xl font-bold mb-5">ຕັ້ງຄ່າ</h1>
+
+  <div class="bg-surface border border-line rounded-2xl p-5 mb-4 flex items-center gap-4">
+    <button data-action="edit-profile" class="relative shrink-0 group">
+      ${avatarHtml(state.user)}
+      <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-brass text-bg grid place-items-center border-2 border-surface">
+        <i data-lucide="pencil" class="w-2.5 h-2.5"></i>
+      </span>
+    </button>
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-medium text-ink truncate">${escapeHtml(state.user.name)}</p>
+      <p class="text-xs text-inkdim truncate mt-0.5">${escapeHtml(state.user.email)}</p>
+    </div>
+  </div>
+
+  <div class="bg-surface border border-line rounded-2xl overflow-hidden mb-6">
+    <button data-action="request-notif" class="w-full flex items-center justify-between p-4 border-b border-line hover:bg-surface2/40 transition-colors text-left">
+      <div class="flex items-center gap-3">
+        <i data-lucide="bell" class="w-4 h-4 text-brass"></i>
+        <div>
+          <p class="text-sm font-medium text-ink">ການແຈ້ງເຕືອນລະບົບ</p>
+          <p class="text-xs text-inkdim mt-0.5">ແຈ້ງເຕືອນວຽກຄົງຄ້າງປະຈຳວັນ</p>
+        </div>
+      </div>
+      <span class="text-xs font-medium px-2.5 py-1 rounded-lg bg-surface2 border border-line text-inkdim">${notifStatusLabel()}</span>
+    </button>
+
+    <div class="p-4 border-b border-line">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <i data-lucide="clock" class="w-4 h-4 text-brass shrink-0"></i>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-ink">ເວລາແຈ້ງເຕືອນປະຈຳວັນ</p>
+            <p class="text-xs text-inkdim mt-0.5">ຈະສະຫຼຸບວຽກຄ້າງ/ວຽກວັນນີ້ໃຫ້ຕອນເວລານີ້</p>
+          </div>
+        </div>
+        <input type="time" id="notif-time-input" value="${state.notifTime || '09:00'}" class="bg-surface2 border border-line rounded-lg px-2.5 py-1.5 text-sm focus:border-brass shrink-0" />
+      </div>
+      <p class="text-[11px] text-inkfaint mt-2.5">ຕ້ອງເປີດແອັບ (ຫຼືເປີດແທັບໄວ້ໃນພື້ນຫຼັງ) ຊ່ວງເວລານັ້ນ ການແຈ້ງເຕືອນຈຶ່ງຈະເດັ້ງຂຶ້ນ — ຖ້າອຸປະກອນປິດ ຫຼື ປິດແທັບ/ແອັບໄປ ຈະບໍ່ໄດ້ຮັບການແຈ້ງເຕືອນ</p>
+    </div>
+
+    <div class="p-4 border-b border-line">
+      <div class="flex items-center gap-3 mb-1">
+        <i data-lucide="database" class="w-4 h-4 text-teal"></i>
+        <p class="text-sm font-medium text-ink">ການຈັດການຂໍ້ມູນ</p>
+      </div>
+      <p class="text-xs text-inkfaint mb-3">Dayframe ເກັບຂໍ້ມູນທັງໝົດໄວ້ໃນອຸປະກອນຂອງທ່ານແບບ Local-first</p>
+      <div class="flex gap-2">
+        <button data-action="backup-data" class="flex-1 bg-surface2 border border-line text-ink text-xs font-medium py-2 rounded-xl active:scale-[0.98] transition-transform">ສຳຮອງຂໍ້ມູນ (Export)</button>
+        <button data-action="trigger-restore" class="flex-1 bg-surface2 border border-line text-ink text-xs font-medium py-2 rounded-xl active:scale-[0.98] transition-transform">ກູ້ຄືນຂໍ້ມູນ (Import)</button>
+        <input type="file" id="restore-file-input" accept=".json" class="hidden" />
+      </div>
+    </div>
+
+    <button data-action="clear-all-data" class="w-full flex items-center gap-3 p-4 text-coral hover:bg-coral/5 transition-colors text-left">
+      <i data-lucide="trash-2" class="w-4 h-4"></i>
+      <div>
+        <p class="text-sm font-medium">ລ້າງຂໍ້ມູນທັງໝົດ</p>
+        <p class="text-[11px] text-coral/70 mt-0.5">ລຶບບັນຊີ ແລະ ຂໍ້ມູນທັງໝົດອອກຈາກອຸປະກອນນີ້ຢ່າງຖາວອນ</p>
+      </div>
+    </button>
+  </div>
+
+  <button data-action="logout" class="w-full flex items-center gap-3 p-4 rounded-2xl bg-surface border border-line text-inkdim hover:text-coral hover:bg-surface2/40 transition-colors text-left">
+    <i data-lucide="log-out" class="w-4 h-4"></i>
+    <span class="text-sm font-medium">ອອກຈາກລະບົບ</span>
+  </button>
+  `;
+}
+
+/* ---------------- MODAL / TOAST OVERLAYS ---------------- */
+
+function modalShell(title, bodyHtml, formId) {
+  return `
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-[fadeIn_.2s_ease_both]">
+    <div class="absolute inset-0 bg-black/60" data-action="close-modal"></div>
+    <form id="${formId || 'modal-form'}" class="sheet-in sm:pop-in relative w-full sm:max-w-md bg-surface border-t sm:border border-line rounded-t-3xl sm:rounded-2xl p-6 overflow-y-auto max-h-[90vh] nested-scroll shadow-soft">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-display text-lg font-semibold text-ink">${title}</h2>
+        <button type="button" data-action="close-modal" class="w-8 h-8 rounded-full bg-surface2 border border-line grid place-items-center text-inkdim hover:text-ink transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      ${bodyHtml}
+    </form>
+  </div>`;
+}
+
+function openQuickAddModal(type) {
+  const t = type || 'task';
+  let content = '';
+  if (t === 'task') {
+    content = `
+      <div class="space-y-3.5">
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ຊື່ວຽກ</label>
+          <input required name="title" autofocus placeholder="ເຊັ່ນ: ອ່ານປຶ້ມ, ສົ່ງວຽກງານ..." class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-inkdim mb-1.5 block">ໝວດໝູ່</label>
+            <select name="category" class="w-full bg-surface2 border border-line rounded-xl px-3 py-3 text-sm focus:border-brass">
+              ${TASK_CATS.map((c) => `<option value="${c.id}">${c.id}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-inkdim mb-1.5 block">ຄວາມສຳຄັນ</label>
+            <select name="priority" class="w-full bg-surface2 border border-line rounded-xl px-3 py-3 text-sm focus:border-brass">
+              ${PRIORITIES.map((p) => `<option value="${p.id}" ${p.id==='ກາງ'?'selected':''}>${p.id}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ກຳນົດສົ່ງວັນທີ</label>
+          <input type="date" name="date" value="${todayISO()}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-2.5 text-sm focus:border-brass" />
+        </div>
+        <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">ເພີ່ມວຽກ</button>
+      </div>`;
+  } else if (t === 'finance') {
+    content = `
+      <div class="space-y-3.5">
+        <div class="bg-surface2 border border-line rounded-xl p-1 flex">
+          <button type="button" id="fm-tab-expense" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-brass text-bg">ລາຍຈ່າຍ</button>
+          <button type="button" id="fm-tab-income" class="flex-1 py-2 rounded-lg text-xs font-semibold text-inkdim"><b>ລາຍຮັບ</b></button>
+        </div>
+        <input type="hidden" name="type" value="expense" />
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ຈຳນວນເງິນ (₭)</label>
+          <input required type="number" step="any" inputmode="decimal" name="amount" autofocus placeholder="0.00" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 font-mono text-lg text-brass focus:border-brass" />
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ໝວດໝູ່</label>
+          <select name="category" id="fm-cat-select" class="w-full bg-surface2 border border-line rounded-xl px-3 py-3 text-sm focus:border-brass">
+            ${FIN_CATS_EXPENSE.map((c) => `<option value="${c}">${c}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ບັນທຶກຊ່ວຍຈຳ</label>
+          <input name="note" placeholder="ເຊັ່ນ: ຄ່າເຂົ້າຊອຍ, ເງິນເດືອນ..." class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ວັນທີ</label>
+          <input type="date" name="date" value="${todayISO()}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-2.5 text-sm focus:border-brass" />
+        </div>
+        <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">ບັນທຶກທຸລະກຳ</button>
+      </div>`;
+  } else if (t === 'note') {
+    content = `
+      <div class="space-y-3.5">
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ຫົວຂໍ້</label>
+          <input name="title" autofocus placeholder="ບໍ່ມີຊື່ຫົວຂໍ້" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ເນື້ອຫາ (ຮອງຮັບ **ໜາ** หรือ *ອຽງ* )</label>
+          <textarea name="content" rows="5" placeholder="ຂຽນບັນທຶກຢູ່ບ່ອນນີ້..." class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass resize-none"></textarea>
+        </div>
+        <div>
+          <label class="text-xs text-inkdim mb-1.5 block">ແທັກ (ແຍກດ້ວຍຈຸດ ,)</label>
+          <input name="tags" placeholder="ເຊັ່ນ: ວຽກ, ໄອເດຍ" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+        </div>
+        <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">ບັນທຶກ</button>
+      </div>`;
+  }
+  document.getElementById('modal-root').innerHTML = modalShell(t === 'task' ? 'ເພີ່ມວຽກໃໝ່' : t === 'finance' ? 'ບັນທຶກການເງິນ' : 'ບັນທຶກໃໝ່', content);
+  lucide.createIcons();
+
+  if (t === 'finance') {
+    const btnExp = document.getElementById('fm-tab-expense');
+    const btnInc = document.getElementById('fm-tab-income');
+    const inputType = document.querySelector('input[name="type"]');
+    const selectCat = document.getElementById('fm-cat-select');
+    const refreshCats = (arr) => selectCat.innerHTML = arr.map((c) => `<option value="${c}">${c}</option>`).join('');
+
+    btnExp.addEventListener('click', () => {
+      inputType.value = 'expense';
+      btnExp.className = 'flex-1 py-2 rounded-lg text-xs font-semibold bg-brass text-bg';
+      btnInc.className = 'flex-1 py-2 rounded-lg text-xs font-semibold text-inkdim';
+      refreshCats(FIN_CATS_EXPENSE);
+    });
+    btnInc.addEventListener('click', () => {
+      inputType.value = 'income';
+      btnInc.className = 'flex-1 py-2 rounded-lg text-xs font-semibold bg-brass text-bg';
+      btnExp.className = 'flex-1 py-2 rounded-lg text-xs font-semibold text-inkdim';
+      refreshCats(FIN_CATS_INCOME);
+    });
+  }
+
+  document.getElementById('modal-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    if (t === 'task') {
+      state.tasks.push({
+        id: uid(), title: fd.get('title').trim(), category: fd.get('category'),
+        priority: fd.get('priority'), date: fd.get('date') || todayISO(), done: false, subtasks: [], order: state.tasks.length
+      });
+      toast('ເພີ່ມວຽກเรียບຮ້ອຍແລ້ວ');
+    } else if (t === 'finance') {
+      state.finance.push({
+        id: uid(), type: fd.get('type'), amount: Math.abs(parseFloat(fd.get('amount'))) || 0,
+        category: fd.get('category'), note: fd.get('note').trim(), date: fd.get('date') || todayISO()
+      });
+      toast('ບັນທຶກທຸລະກຳແລ້ວ');
+    } else if (t === 'note') {
+      const tags = fd.get('tags').split(',').map((x) => x.trim().replace('#', '')).filter(Boolean);
+      state.notes.push({
+        id: uid(), title: fd.get('title').trim(), content: fd.get('content').trim(), tags, date: todayISO()
+      });
+      toast('ບັນທຶກຂໍ້ມູນແລ້ວ');
+    }
+    saveAll(); closeModal(); render();
+  });
+}
+
+function openEditNoteModal(id) {
+  const n = state.notes.find((x) => x.id === id);
+  if (!n) return;
+  document.getElementById('modal-root').innerHTML = modalShell('ແກ້ໄຂບັນທຶກ', `
+    <div class="space-y-3.5">
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ຫົວຂໍ້</label>
+        <input name="title" value="${escapeHtml(n.title)}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ເນື້ອຫາ</label>
+        <textarea name="content" rows="7" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass resize-none">${escapeHtml(n.content)}</textarea>
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ແທັກ (ແຍກດ້ວຍຈຸດ ,)</label>
+        <input name="tags" value="${escapeHtml((n.tags || []).join(', '))}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">ບັນທຶກການແກ້ໄຂ</button>
+    </div>`);
+  lucide.createIcons();
+
+  document.getElementById('modal-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    n.title = fd.get('title').trim();
+    n.content = fd.get('content').trim();
+    n.tags = fd.get('tags').split(',').map((x) => x.trim().replace('#', '')).filter(Boolean);
+    saveAll(); closeModal(); render(); toast('ອັບເດດບັນທຶກແລ້ວ');
+  });
+}
+
+function openAddHabitModal() {
+  let selectedIcon = HABIT_ICONS[0];
+  document.getElementById('modal-root').innerHTML = modalShell('ສ້າງນິໄສໃໝ່', `
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ຊື່ນິໄສ</label>
+        <input required name="name" autofocus placeholder="ເຊັ່ນ: ດື່ມນ້ຳ 2L, ນັ່ງສະມາທິ..." class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 text-sm focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-2 block">ເລືອກໄອຄອນ</label>
+        <div class="grid grid-cols-5 gap-2.5">
+          ${HABIT_ICONS.map((icon) => `
+            <button type="button" data-icon="${icon}" class="habit-icon-picker aspect-square rounded-xl border border-line bg-surface2 grid place-items-center text-inkdim transition-colors hover:border-brass">
+              <i data-lucide="${icon}" class="w-5 h-5"></i>
+            </button>`).join('')}
+        </div>
+      </div>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2 active:scale-[0.98] transition-transform">ສ້າງນິໄສ</button>
+    </div>`);
+  lucide.createIcons();
+
+  const pickers = document.querySelectorAll('.habit-icon-picker');
+  const setIcon = (ic) => {
+    selectedIcon = ic;
+    pickers.forEach((p) => {
+      const active = p.dataset.icon === ic;
+      p.className = `habit-icon-picker aspect-square rounded-xl border grid place-items-center transition-colors ` + (active ? 'border-brass bg-brass/10 text-brass' : 'border-line bg-surface2 text-inkdim');
+    });
+  };
+  setIcon(selectedIcon);
+  pickers.forEach((p) => p.addEventListener('click', () => setIcon(p.dataset.icon)));
+
+  document.getElementById('modal-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = e.target.name.value.trim();
+    if (!name) return;
+    state.habits.push({ id: uid(), name, icon: selectedIcon, history: {}, streak: 0 });
+    saveAll(); closeModal(); render(); toast('ເພີ່ມນິໄສໃໝ່ແລ້ວ');
+  });
+}
+
+function openEditBudgetModal() {
+  document.getElementById('modal-root').innerHTML = modalShell('ງົບປະມານລາຍເດືອນ', `
+    <div class="space-y-4">
+      <p class="text-xs text-inkdim leading-relaxed">ກຳນົດວົງເງິນລາຍຈ່າຍສູງສຸດຂອງທ່ານໃນເດືອນນີ້ ເພື່ອຄວບຄຸມລະບົບການເງິນໃຫ້ມີປະສິດທິພາບ</p>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ງົບປະມານປະຈຳເດືອນ (₭)</label>
+        <input required type="number" name="monthly" value="${state.budget.monthly || ''}" placeholder="ບໍ່ມີກຳນົດວົງເງິນ" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 font-mono text-base focus:border-brass" />
+      </div>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-1">ບັນທຶກງົບປະມານ</button>
+    </div>`);
+  document.getElementById('modal-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    state.budget.monthly = parseFloat(e.target.monthly.value) || 0;
+    saveAll(); closeModal(); render(); toast('ອັບເດດງົບປະມານແລ້ວ');
+  });
+}
+
+function openEditGoalModal() {
+  document.getElementById('modal-root').innerHTML = modalShell('ເປົ້າໝາຍການອອມ', `
+    <div class="space-y-3.5">
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ຈຳນວນເງິນເປົ້າໝາຍ (₭)</label>
+        <input required type="number" name="target" value="${state.goal.target}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 font-mono text-sm focus:border-brass" />
+      </div>
+      <div>
+        <label class="text-xs text-inkdim mb-1.5 block">ເງິນອອມສະສົມປັດຈຸບັນ (₭)</label>
+        <input required type="number" name="saved" value="${state.goal.saved}" class="w-full bg-surface2 border border-line rounded-xl px-4 py-3 font-mono text-sm focus:border-brass" />
+      </div>
+      <button type="submit" class="w-full bg-brass text-bg font-semibold rounded-xl py-3.5 text-sm mt-2">ອັບເດດເປົ້າໝາຍ</button>
+    </div>`);
+  document.getElementById('modal-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    state.goal.target = Math.max(1, parseFloat(e.target.target.value) || 0);
+    state.goal.saved = parseFloat(e.target.saved.value) || 0;
+    saveAll(); closeModal(); render(); toast('ອັບເດດເປົ້າໝາຍການອອມແລ້ວ');
+  });
+}
+
+function closeModal() { document.getElementById('modal-root').innerHTML = ''; }
+
+function toast(msg, duration) {
+  const root = document.getElementById('toast-root');
+  const el = document.createElement('div');
+  el.className = 'toast-in bg-ink text-bg text-xs font-semibold px-4 py-2.5 rounded-xl shadow-soft flex items-center gap-2 pointer-events-auto';
+  el.innerHTML = `<i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i> <span>${escapeHtml(msg)}</span>`;
+  root.appendChild(el);
+  lucide.createIcons();
+  setTimeout(() => {
+    el.style.animation = 'fadeIn .2s ease reverse both';
+    setTimeout(() => el.remove(), 200);
+  }, duration || 2800);
+}
+
+/* ---------------- GLOBAL COMMAND SEARCH (⌘K) ---------------- */
+
+function renderSearch() {
+  const root = document.getElementById('search-root');
+  if (!state.searchOpen) { root.innerHTML = ''; return; }
+
+  const q = state.searchQuery.toLowerCase().trim();
+  let results = [];
+
+  if (q.length > 0) {
+    state.tasks.forEach((t) => { if (t.title.toLowerCase().includes(q)) results.push({ type: 'task', title: t.title, sub: `ວຽກ · ${t.category}`, view: 'tasks' }); });
+    state.finance.forEach((f) => { if ((f.note || f.category).toLowerCase().includes(q)) results.push({ type: 'finance', title: f.note || f.category, sub: `ການເງິນ · ${f.type==='income'?'ລາຍຮັບ':'ລายຈ່າຍ'} (${fmtMoney(f.amount)})`, view: 'finance' }); });
+    state.notes.forEach((n) => { if (n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)) results.push({ type: 'note', title: n.title || 'ບັນທຶກບໍ່ມີຊື່', sub: `ບັນທຶກ · ${n.content.slice(0,30)}...`, view: 'notes' }); });
+  } else {
+    results = [
+      { icon: 'list-todo', title: 'ໄປທີ່ໜ້າ ວຽກ', action: 'view:tasks' },
+      { icon: 'wallet', title: 'ໄປທີ່ໜ້າ ການເງິນ', action: 'view:finance' },
+      { icon: 'notebook-pen', title: 'ໄປທີ່ໜ້າ ບັນທຶກ', action: 'view:notes' },
+      { icon: 'flame', title: 'ໄປທີ່ໜ້າ ນິໄສ', action: 'view:habits' },
+    ];
+  }
+
+  root.innerHTML = `
+  <div class="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 sm:pt-24 animate-[fadeIn_.18s_ease_both]">
+    <div class="absolute inset-0 bg-black/60 shadow-soft" data-action="close-search"></div>
+    <div class="bg-surface border border-line w-full max-w-xl rounded-2xl overflow-hidden relative flex flex-col max-h-[70vh] pop-in">
+      <div class="relative border-b border-line shrink-0">
+        <i data-lucide="search" class="w-5 h-5 text-inkfaint absolute left-4 top-1/2 -translate-y-1/2"></i>
+        <input id="global-search-input" value="${escapeHtml(state.searchQuery)}" placeholder="ຄົ້ນຫາທຸກສິ່ງ (ວຽກ, ບັນທຶກ, ການເງິນ...)" class="w-full bg-transparent pl-12 pr-4 py-4 text-sm placeholder:text-inkfaint focus:outline-none" />
+      </div>
+      <div class="flex-1 overflow-y-auto p-2 space-y-0.5 nested-scroll">
+        ${results.length === 0 ? `<p class="text-center text-xs text-inkfaint py-8">ບໍ່ພົບຜົນການຄົ້ນຫາສຳລັບ "${escapeHtml(state.searchQuery)}"</p>` : results.map((r, i) => `
+          <button data-search-idx="${i}" data-view="${r.view || ''}" data-action="${r.action || 'goto-view'}" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm hover:bg-surface2/60 transition-colors group">
+            <div class="w-7 h-7 rounded-lg border border-line bg-surface2 grid place-items-center shrink-0 text-inkdim group-hover:text-brass transition-colors">
+              <i data-lucide="${r.icon || (r.type==='task'?'list-todo':r.type==='finance'?'wallet':'notebook-pen')}" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-ink truncate font-medium">${escapeHtml(r.title)}</p>
+              ${r.sub ? `<p class="text-[11px] text-inkfaint truncate mt-0.5">${escapeHtml(r.sub)}</p>` : ''}
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-inkfaint opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
+  lucide.createIcons();
+  document.getElementById('global-search-input').focus();
+
+  document.getElementById('global-search-input').addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    renderSearch();
+  });
+}
+
+function toggleSearch() {
+  state.searchOpen = !state.searchOpen;
+  if (!state.searchOpen) state.searchQuery = '';
+  renderSearch();
+}
+
+/* ---------------- BACKUP & DATA IMPORTS ---------------- */
+
+function backupData() {
+  const ns = state.user.email;
+  const bundle = {
+    dayframe_v1: true, email: ns,
+    tasks: state.tasks, finance: state.finance, goal: state.goal,
+    notes: state.notes, habits: state.habits, budget: state.budget
+  };
+  const str = JSON.stringify(bundle);
+  const blob = new Blob([str], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dayframe-backup-${ns}-${todayISO()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('ສົ່ງອອກໄຟລ໌ສຳຮອງຂໍ້ມູນແລ້ວ');
+}
+
+function restoreData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const bundle = JSON.parse(reader.result);
+      if (!bundle.dayframe_v1) throw new Error('invalid format');
+      state.tasks = bundle.tasks || [];
+      state.finance = bundle.finance || [];
+      state.goal = bundle.goal || { target: 20000, saved: 0 };
+      state.notes = bundle.notes || [];
+      state.habits = bundle.habits || [];
+      state.budget = bundle.budget || { monthly: 0 };
+      saveAll(); render(); toast('ກູ້ຄືນຂໍ້ມູນສຳເລັດແລ້ວ!');
+    } catch (e) { toast('ໄຟລ໌ສຳຮອງບໍ່ຖືກຕ້ອງ'); }
+  };
+  reader.readAsText(file);
+}
+
+async function clearAllData() {
+  if (!confirm('ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບຂໍ້ມູນທັງໝົດ? ລະບົບຈະບໍ່ສາມາດກູ້ຄືນໄດ້ອີກ.')) return;
+  if (sbClient && state.user) {
+    const { error } = await sbClient.from('user_data').delete().eq('user_id', state.user.id);
+    if (error) { toast('ລຶບຂໍ້ມູນບໍ່ສຳເລັດ — ' + error.message, 5000); return; }
+  }
+  toast('ລຶບຂໍ້ມູນທັງໝົດແລ້ວ');
+  await logout();
+}
+
+/* ---------------- CONTROLLERS & EVENT COUPLING ---------------- */
+
+function wireViewSpecificEvents() {
+  if (state.view === 'tasks') { wireTaskDragDrop(); }
+  if (state.view === 'finance') { drawFinanceCharts(); }
+  if (state.view === 'notes') {
+    const si = document.getElementById('note-search-input');
+    if (si) {
+      si.addEventListener('input', (e) => { state.noteSearch = e.target.value; const root = document.getElementById('view-root'); const currentScroll = window.scrollY; render(); window.scrollTo(0, currentScroll); const input = document.getElementById('note-search-input'); input.focus(); input.setSelectionRange(input.value.length, input.value.length); });
+    }
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const tar = e.target.closest('[data-action]');
+  if (!tar) return;
+  const act = tar.dataset.action;
+
+  if (act === 'auth-tab') setAuthTab(tar.dataset.tab);
+  if (act === 'demo-login') { doLogin('demo@dayframe.app', 'demo1234', false); }
+  if (act === 'logout') logout();
+  if (act === 'set-view') setView(tar.dataset.view);
+  if (act === 'quick-add') openQuickAddModal(tar.dataset.type);
+  if (act === 'close-modal') closeModal();
+
+  // Tasks actions
+  if (act === 'toggle-task') {
+    const t = state.tasks.find((x) => x.id === tar.dataset.id);
+    if (t) { t.done = !t.done; saveAll(); render(); }
+  }
+  if (act === 'delete-task') {
+    state.tasks = state.tasks.filter((x) => x.id !== tar.dataset.id);
+    saveAll(); render(); toast('ລຶບວຽກອອກແລ້ວ');
+  }
+  if (act === 'toggle-subtasks') {
+    state.expandedTasks = state.expandedTasks || {};
+    state.expandedTasks[tar.dataset.id] = !state.expandedTasks[tar.dataset.id];
+    render();
+  }
+  if (act === 'toggle-subtask') {
+    const t = state.tasks.find((x) => x.id === tar.dataset.id);
+    if (t) {
+      const s = (t.subtasks || []).find((x) => x.id === tar.dataset.sub);
+      if (s) { s.done = !s.done; saveAll(); render(); }
+    }
+  }
+  if (act === 'delete-subtask') {
+    const t = state.tasks.find((x) => x.id === tar.dataset.id);
+    if (t) { t.subtasks = (t.subtasks || []).filter((x) => x.id !== tar.dataset.sub); saveAll(); render(); }
+  }
+  if (act === 'filter-cat') { state.taskFilter = tar.dataset.cat; render(); }
+  if (act === 'filter-date') { state.taskDateFilter = state.taskDateFilter === tar.dataset.date ? null : tar.dataset.date; render(); }
+  if (act === 'week-prev') { state.weekOffset = (state.weekOffset || 0) - 1; render(); }
+  if (act === 'week-next') { state.weekOffset = (state.weekOffset || 0) + 1; render(); }
+  if (act === 'week-today') { state.weekOffset = 0; state.taskDateFilter = null; render(); }
+
+  // Pomodoro
+  if (act === 'pomodoro-toggle') pomodoroToggle();
+  if (act === 'pomodoro-reset') pomodoroReset();
+
+  // Finance actions
+  if (act === 'delete-finance') {
+    state.finance = state.finance.filter((x) => x.id !== tar.dataset.id);
+    saveAll(); render(); toast('ລຶບລາຍການແລ້ວ');
+  }
+  if (act === 'edit-budget') openEditBudgetModal();
+  if (act === 'edit-goal') openEditGoalModal();
+  if (act === 'export-finance-csv') exportFinanceCSV();
+
+  // Notes actions
+  if (act === 'filter-tag') { state.noteTagFilter = tar.dataset.tag || null; render(); }
+  if (act === 'edit-note') { if (!e.target.closest('[data-action="delete-note"]')) openEditNoteModal(tar.dataset.id); }
+  if (act === 'delete-note') {
+    state.notes = state.notes.filter((x) => x.id !== tar.dataset.id);
+    saveAll(); render(); toast('ລຶບບັນທຶກແລ້ວ');
+  }
+
+  // Habits actions
+  if (act === 'toggle-habit') {
+    const h = state.habits.find((x) => x.id === tar.dataset.id);
+    if (h) {
+      const today = todayISO();
+      if (h.history[today]) delete h.history[today]; else h.history[today] = true;
+      saveAll(); render();
+    }
+  }
+  if (act === 'toggle-habit-day') {
+    const h = state.habits.find((x) => x.id === tar.dataset.id);
+    const d = tar.dataset.date;
+    if (h && d) {
+      if (h.history[d]) delete h.history[d]; else h.history[d] = true;
+      saveAll(); render();
+    }
+  }
+  if (act === 'add-habit') openAddHabitModal();
+  if (act === 'toggle-habit-heatmap') { state.habitHeatmap = !state.habitHeatmap; render(); }
+  if (act === 'delete-habit') {
+    if (confirm('ຕ້ອງການລຶບນິໄສນີ້ ແລະ ສະຖິຕິທັງໝົດບໍ?')) { state.habits = state.habits.filter((x) => x.id !== tar.dataset.id); saveAll(); render(); toast('ລຶບນິໄສອອກແລ້ວ'); }
+  }
+
+  // Settings
+  if (act === 'edit-profile') openProfileModal();
+  if (act === 'open-password-modal') openPasswordModal();
+  if (act === 'open-forgot-password') openForgotPasswordModal();
+  if (act === 'signup-back') backToSignupFields();
+  if (act === 'signup-resend-otp') resendSignupOtp();
+  if (act === 'request-notif') requestNotifPermission();
+  if (act === 'backup-data') backupData();
+  if (act === 'trigger-restore') { document.getElementById('restore-file-input').click(); }
+  if (act === 'clear-all-data') clearAllData();
+
+  // Dashboard calendar
+  if (act === 'toggle-month-calendar') { state.showMonthCalendar = !state.showMonthCalendar; render(); }
+  if (act === 'month-prev') { state.calendarMonthOffset = (state.calendarMonthOffset || 0) - 1; render(); }
+  if (act === 'month-next') { state.calendarMonthOffset = (state.calendarMonthOffset || 0) + 1; render(); }
+  if (act === 'filter-date-goto') { state.view = 'tasks'; state.taskDateFilter = tar.dataset.date; buildNav(); render(); }
+
+  // Global search UI
+  if (act === 'open-search') toggleSearch();
+  if (act === 'close-search') toggleSearch();
+  if (act === 'goto-view') {
+    const targetView = tar.dataset.view;
+    toggleSearch();
+    if (targetView) setView(targetView);
+  }
+  if (act === 'retry-weather') loadWeather();
+});
+
+// Capture subtask inline form submits
+document.addEventListener('submit', (e) => {
+  const form = e.target.closest('[data-action="add-subtask-form"]');
+  if (!form) return;
+  e.preventDefault();
+  const id = form.dataset.id;
+  const title = form.subtitle.value.trim();
+  if (!title) return;
+  const t = state.tasks.find((x) => x.id === id);
+  if (t) {
+    t.subtasks = t.subtasks || [];
+    t.subtasks.push({ id: uid(), title, done: false });
+    saveAll(); render();
+  }
+});
+
+// Form bindings for login/registration
+document.getElementById('login-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  doLogin(document.getElementById('login-email').value.trim().toLowerCase(), document.getElementById('login-password').value);
+});
+document.getElementById('signup-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (state.signupStep === 'otp') {
+    verifySignupOtp(document.getElementById('signup-otp').value.trim());
+  } else {
+    startSignupOtp(document.getElementById('signup-name').value.trim(), document.getElementById('signup-email').value.trim().toLowerCase(), document.getElementById('signup-password').value);
+  }
+});
+
+// Restore listener file change event (delegated: #restore-file-input only exists
+// once the Settings view has been rendered, so we can't bind directly at boot time)
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.id === 'restore-file-input') {
+    restoreData(e.target.files[0]);
+  }
+  if (e.target && e.target.id === 'notif-time-input') {
+    state.notifTime = e.target.value || '09:00';
+    saveAll();
+    if (state.user) localStorage.removeItem('dayframe_notif_check:' + state.user.email);
+    startNotifScheduler();
+    toast('ບັນທຶກເວລາແຈ້ງເຕືອນແລ້ວ — ' + state.notifTime);
+  }
+});
+
+// FAB Action trigger
+document.getElementById('fab-btn').addEventListener('click', () => {
+  const overlay = document.getElementById('fab-overlay');
+  const icon = document.getElementById('fab-icon');
+  const isHidden = overlay.classList.contains('hidden');
+  overlay.classList.toggle('hidden');
+  icon.setAttribute('data-lucide', isHidden ? 'x' : 'plus');
+  lucide.createIcons();
+});
+document.querySelector('#fab-overlay [data-action="toggle-fab"]').addEventListener('click', () => {
+  document.getElementById('fab-overlay').classList.add('hidden');
+  document.getElementById('fab-icon').setAttribute('data-lucide', 'plus');
+  lucide.createIcons();
+});
+
+// Hotkey binding for search overlay (Cmd+K / Ctrl+K)
+window.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    toggleSearch();
+  }
+  if (e.key === 'Escape' && state.searchOpen) toggleSearch();
+});
+
+/* ---------------- SERVICE WORKER REGISTRATION ---------------- */
+// After every deploy, bump CACHE_VERSION in sw.js. When a visitor already has
+// the app open/cached and a new service worker activates, this listener
+// reloads the page once automatically so they never get stuck looking at a
+// stale cached version of the app.
+if ('serviceWorker' in navigator) {
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing) return;
+    swRefreshing = true;
+    window.location.reload();
+  });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+/* ---------------- APP CORE BOOT ---------------- */
+async function init() {
+  initSupabaseClient();
+  if (!sbClient) {
+    // SUPABASE_URL/SUPABASE_ANON_KEY haven't been filled in yet — surface
+    // this clearly instead of silently failing every auth/data call.
+    setAuthTab('login');
+    toast('ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ Supabase — ກະລຸນາຕັ້ງຄ່າ SUPABASE_URL/SUPABASE_ANON_KEY ໃນໂຄດ', 8000);
+    return;
+  }
+  // Keep the session in sync across tabs / after token refresh, and log the
+  // user out here automatically if they sign out from another tab.
+  sbClient.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT' && state.user) logout();
+  });
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (session) {
+    const meta = session.user.user_metadata || {};
+    state.user = { id: session.user.id, email: session.user.email, name: meta.name || session.user.email, avatar: meta.avatar || null };
+    await loadUserData(state.user.id);
+    enterApp();
+    return;
+  }
+  setAuthTab('login');
+}
+
+// Deferred CDN scripts (lucide, Chart.js, Sortable, marked) only finish executing
+// right before DOMContentLoaded fires. Booting straight away (this script runs
+// synchronously during parsing, earlier than any deferred script) would call
+// lucide.createIcons() before `lucide` exists — crashing before the dashboard
+// ever renders. Waiting for DOMContentLoaded guarantees the libs are ready.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
