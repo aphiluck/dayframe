@@ -596,11 +596,7 @@ const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 let _saveInFlight = false;
 let _savePending = false;
 async function saveAll() {
-  if (!state.user || !sbClient) return;
-  // Coalesce rapid-fire saves (e.g. toggling several habit days quickly)
-  // into a single network request instead of racing many upserts.
-  if (_saveInFlight) { _savePending = true; return; }
-  _saveInFlight = true;
+  if (!state.user) return;
   const payload = {
     user_id: state.user.id,
     tasks: state.tasks,
@@ -613,6 +609,13 @@ async function saveAll() {
     updated_at: new Date().toISOString(),
   };
   localStorage.setItem(LS_KEYS.notifTime, state.notifTime || '09:00');
+  localStorage.setItem('dayframe_cache_' + state.user.id, JSON.stringify(payload));
+
+  if (!sbClient) return;
+  // Coalesce rapid-fire saves (e.g. toggling several habit days quickly)
+  // into a single network request instead of racing many upserts.
+  if (_saveInFlight) { _savePending = true; return; }
+  _saveInFlight = true;
   try {
     const { error } = await sbClient.from('user_data').upsert(payload);
     if (error) toast('ບັນທຶກຂຶ້ນ cloud ບໍ່ສຳເລັດ — ' + error.message, 5000);
@@ -630,21 +633,47 @@ async function loadUserData(userId) {
     state.notes = []; state.habits = []; state.budget = { monthly: 0 };
     state.notifTime = localStorage.getItem(LS_KEYS.notifTime) || '09:00';
   };
-  if (!sbClient) { empty(); return; }
+  const loadLocalCache = () => {
+    try {
+      const cacheStr = localStorage.getItem('dayframe_cache_' + userId);
+      if (cacheStr) {
+        const data = JSON.parse(cacheStr);
+        state.tasks = data.tasks || [];
+        state.finance = data.finance || [];
+        state.goal = data.goal || { target: 20000, saved: 0 };
+        state.notes = data.notes || [];
+        state.habits = data.habits || [];
+        state.budget = data.budget || { monthly: 0 };
+        state.notifTime = data.notif_time || '09:00';
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  };
+
+  const hasLocal = loadLocalCache();
+  if (!hasLocal) empty();
+
+  if (!sbClient) return;
   try {
     const { data, error } = await sbClient.from('user_data').select('*').eq('user_id', userId).maybeSingle();
-    if (error) { toast('ໂຫລດຂໍ້ມູນຈາກ cloud ບໍ່ສຳເລັດ — ' + error.message, 5000); empty(); return; }
-    if (!data) { empty(); return; }
-    state.tasks = data.tasks || [];
-    state.finance = data.finance || [];
-    state.goal = data.goal || { target: 20000, saved: 0 };
-    state.notes = data.notes || [];
-    state.habits = data.habits || [];
-    state.budget = data.budget || { monthly: 0 };
-    state.notifTime = data.notif_time || '09:00';
+    if (error) { 
+      toast('ໂຫລດຂໍ້ມູນຈາກ cloud ບໍ່ສຳເລັດ — ໃຊ້ຂໍ້ມູນລ່າສຸດໃນເຄື່ອງແທນ', 5000); 
+      return; 
+    }
+    if (data) {
+      state.tasks = data.tasks || [];
+      state.finance = data.finance || [];
+      state.goal = data.goal || { target: 20000, saved: 0 };
+      state.notes = data.notes || [];
+      state.habits = data.habits || [];
+      state.budget = data.budget || { monthly: 0 };
+      state.notifTime = data.notif_time || '09:00';
+      localStorage.setItem('dayframe_cache_' + userId, JSON.stringify(data));
+      if (typeof render === 'function') render();
+    }
   } catch (e) {
-    toast('ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ, ໂຫລດຂໍ້ມູນຈາກ cloud ບໍ່ໄດ້', 5000);
-    empty();
+    toast('ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ, ໃຊ້ຂໍ້ມູນລ່າສຸດໃນເຄື່ອງແທນ', 5000);
   }
 }
 
