@@ -617,10 +617,11 @@ async function saveAll() {
   if (_saveInFlight) { _savePending = true; return; }
   _saveInFlight = true;
   try {
-    const { error } = await sbClient.from('user_data').upsert(payload);
+    // Prevent infinite hang if connection drops
+    const { error } = await withTimeout(sbClient.from('user_data').upsert(payload), 10000, 'savetimeout');
     if (error) toast('ບັນທຶກຂຶ້ນ cloud ບໍ່ສຳເລັດ — ' + error.message, 5000);
   } catch (e) {
-    toast('ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ, ບໍ່ສາມາດບັນທຶກໄດ້ໃນຕອນນີ້', 5000);
+    toast('ການເຊື່ອມຕໍ່ມີບັນຫາ, ບັນທຶກລົງເຄື່ອງແລ້วແຕ່ຍັງບໍ່ຂຶ້ນ Cloud', 5000);
   } finally {
     _saveInFlight = false;
     if (_savePending) { _savePending = false; saveAll(); }
@@ -1150,7 +1151,9 @@ function openForgotPasswordOtpModal(email) {
 
 async function logout() {
   stopNotifScheduler();
-  if (sbClient) await sbClient.auth.signOut();
+  if (sbClient) {
+    try { await withTimeout(sbClient.auth.signOut(), 3000, 'logout'); } catch(e) {}
+  }
   state.user = null;
   document.getElementById('app-shell').classList.add('hidden');
   document.getElementById('auth-screen').classList.remove('hidden');
